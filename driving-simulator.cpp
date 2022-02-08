@@ -2,17 +2,7 @@
 
 #define MAXSPEED 20.0
 #define COEFF 1
-
-//double cameraHeight;
-//double angle;
-//double map_angle;
-//double Block_size = 40;
-//double Block_distance = 38, size_cube = 38;
-//int slices_spehere = 30, stacks_spehere = 30;
-//int segments_cylinder = 24;
-//double temp = 0;
-//double move_pos = 2;
-//double ar = 0;
+#define PI (2*acos(0.0))
 
 double cameraAngle;
 int drawgrid;
@@ -70,7 +60,6 @@ int main(int argc, char **argv){
     return 0;
 }
 
-
 //point l, u, r;
 car_coord coord_car;
 
@@ -105,6 +94,24 @@ void display() {
     y_font -= speed;
 
     output(x_font, y_font, str);
+
+    /* ajout des 4 points nécessaires à la construction de la route de bezier */
+    // premiere portion
+    std::array<double, 2> p1, p2, p3, p4;
+    p1[0] = 100.0; p1[1] = -2500.0;
+    p2[0] = 120.0; p2[1] = -3200.0;
+    p3[0] = 250.0; p3[1] = -3800.0;
+    p4[0] = 300.0; p4[1] = -4000.0;
+
+    drawRoadBezier(p1, p2, p3, p4);
+
+    // 2e portion
+    p1[0] = 300.0; p1[1] = -4000.0;
+    p2[0] = 400.0; p2[1] = -4500.0;
+    p3[0] = -200.0; p3[1] = -4800.0;
+    p4[0] = 500.0; p4[1] = -5000.0;
+
+    drawRoadBezier(p1, p2, p3, p4);
 
     if(abs(car) <= 1500) {
         for(int i = 0, j = 0; i <= 10; i++, j += 200) {
@@ -212,7 +219,8 @@ void display() {
         drawRoad();
         drawRoadMiddle();
 
-    } else if (abs(car) <= 2000) {
+    }
+    /*else if (abs(car) <= 2000) {
         for(int i = 0, j = 0; i <= 15; i++, j += 200) {
             glPushMatrix();
             glTranslatef(-120,-j,0);
@@ -340,7 +348,12 @@ void display() {
         glVertex3f(2,-1700,-30);
         glEnd();
         glPopMatrix();
-    }
+    }*/
+/*
+    drawCircle(900, -2500, -29,0.245, 0.245, 0.245, 1000, 100); // right road
+    drawCircle(900, -2500, -28.9,1, 1, 1, 902, 100); // middle road
+    drawCircle(900, -2500, -28.8,0.245, 0.245, 0.245, 898, 100); // left road
+    drawCircle(900, -2500, -28.7,.345, 0.4, 0, 800, 100); // ellipse with background color*/
 
     drawMainCar(leftRightMove, car);
     drawBackground(sky);
@@ -396,7 +409,6 @@ void init() {
     coord_car.br.x = -17;
     coord_car.br.y = -60;
     coord_car.br.z = -30;
-
 
 
     /*
@@ -477,16 +489,11 @@ void specialKeyListener(int key, int x,int y) {
                 break;
             }*/
 
-            //speed = deceleration(speed);
+            speed = deceleration(speed);
             car += speed;
             Y += speed;
             X += speed;
-            {
-                if (speed > -4.9)
-                    sky += 5 * (abs(speed) / 5);
-                else
-                    sky -= 5;
-            }
+            sky += speed;
             break;
 
         case GLUT_KEY_UP:

@@ -112,6 +112,19 @@ void output(double x, double y, char *string) {
     }
 }
 
+constexpr int factorial(int n) {
+    if (n<=1)
+        return(1);
+    else
+        n=n*factorial(n-1);
+    return n;
+}
+
+float binomial_coff(float n,float k) {
+    float ans;
+    ans = factorial(n) / (factorial(k)*factorial(n-k));
+    return ans;
+}
 
 
 ///**********       Draw       **********////
@@ -359,4 +372,87 @@ void drawHill(double sky) {
         glColor3f(0,0.9,0.5);
         glutSolidCone(200,400,20,20);
     }glPopMatrix();
+}
+
+void drawLine(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, double z) {
+    glBegin(GL_TRIANGLES);
+    glVertex3f(p1[0], p1[1], z);
+    glVertex3f(p2[0], p2[1], z);
+    glVertex3f(p3[0], p3[1], z);
+    glEnd();
+    glFlush();
+}
+
+std::array<double, 2> drawBezierGeneralized(std::array<std::array<double, 2>,4> PT, double t, double z_) {
+
+    double x = 0, y = 0, z = z_;
+
+    for (int i = 0; i<4; i++) {
+        x = x + binomial_coff((float)(4 /*number of points*/- 1), (float)i) * pow(t, (double)i) * pow((1 - t), (4 - 1 - i)) * PT[i][0];
+        y = y + binomial_coff((float)(4 - 1), (float)i) * pow(t, (double)i) * pow((1 - t), (4 - 1 - i)) * PT[i][1];
+    }
+
+    std::array<double, 2> ret;
+    ret[0] = x;
+    ret[1] = y;
+
+    //std::cout << "ret " << ret[0] << " " << ret[1] << " " << ret[2] << std::endl;
+    return ret;
+}
+
+void drawBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4,
+                std::array<double, 2> p5, std::array<double, 2> p6, std::array<double, 2> p7, std::array<double, 2> p8,
+                double z, double r, double g, double b){
+
+    glColor3f(1,0,0);
+
+    std::array<double, 2> p1_ = p1;
+    std::array<double, 2> p5_ = p5;
+    /* Draw each segment of the curve.Make t increment in smaller amounts for a more detailed curve.*/
+
+    std::array<std::array<double, 2>,4> array1, array2;
+
+    array1[0] = p1; array2[0] = p5;
+    array1[1] = p2; array2[1] = p6;
+    array1[2] = p3; array2[2] = p7;
+    array1[3] = p4; array2[3] = p8;
+    glColor3f(r,g,b);
+    for(double t = 0.0;t <= 1.0; t += 0.02) {
+        std::array<double, 2> p2_ = drawBezierGeneralized(array1, t, z);
+        std::array<double, 2> p6_ = drawBezierGeneralized(array2,t, z);
+        drawLine(p1_, p5_, p2_, z);
+        drawLine(p5_, p2_, p6_, z);
+        p1_ = p2_;
+        p5_ = p6_;
+    }
+
+    glColor3f(r,g,b);
+}
+
+void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4) {
+    std::array<double, 2> f1, f2, f3, f4;
+    f1[0] = p1[0]; f1[1] = p1[1];
+    f2[0] = p2[0]; f2[1] = p2[1];
+    f3[0] = p3[0]; f3[1] = p3[1];
+    f4[0] = p4[0]; f4[1] = p4[1];
+
+    std::array<double, 2> g1, g2, g3, g4;
+    g1[0] = p1[0]-200; g1[1] = p1[1];
+    g2[0] = p2[0]-200; g2[1] = p2[1];
+    g3[0] = p3[0]-200; g3[1] = p3[1];
+    g4[0] = p4[0]-200; g4[1] = p4[1];
+
+    drawBezier(f1, f2, f3, f4, g1, g2, g3, g4, -30.0, 0.245, 0.245, 0.245);
+
+    f1[0] = p1[0]-98;
+    f2[0] = p2[0]-98;
+    f3[0] = p3[0]-98;
+    f4[0] = p4[0]-98;
+
+    g1[0] = p1[0]-102;
+    g2[0] = p2[0]-102;
+    g3[0] = p3[0]-102;
+    g4[0] = p4[0]-102;
+    drawBezier(f1, f2, f3, f4, g1, g2, g3, g4, -29.80, 1, 1, 1);
+
 }
