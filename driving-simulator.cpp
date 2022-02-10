@@ -88,12 +88,13 @@ void display() {
     sky -= speed;
     speed *= 0.98;
 
+    /*
     std::string s = "speed : " + std::to_string(speed);
     s.pop_back();s.pop_back();s.pop_back();s.pop_back();s.pop_back();
     char *str = &s[0];
     y_font -= speed;
-
     output(x_font, y_font, str);
+     */
 
     /* ajout des 4 points nécessaires à la construction de la route de bezier */
     // premiere portion
