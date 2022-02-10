@@ -456,3 +456,79 @@ void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::arr
     drawBezier(f1, f2, f3, f4, g1, g2, g3, g4, -29.80, 1, 1, 1);
 
 }
+
+void HUD(double speed) {
+    glTranslatef(-450, -450, 0);
+
+    glColor3f(0.663, 0.663, 0.663); 
+ 
+    GLUquadricObj *p = gluNewQuadric();
+        
+    gluDisk(p, 0, 100, 100, 100);
+ 
+    //MARKINGS
+    glTranslatef(0, 0, 0.5);
+  
+    glColor3f(0, 0, 0);
+    gluDisk(p, 92, 100, 100, 100);
+
+    glColor3f(0, 0.980, 0.604);
+    gluPartialDisk(p, 70, 90, 100, 100, -120, 40);
+    glColor3f(0.196, 0.804, 0.196);
+    gluPartialDisk(p, 70, 90, 100, 100, -80, 40);
+    glColor3f(0.604, 0.804, 0.196);
+    gluPartialDisk(p, 70, 90, 100, 100, -40, 40);
+    glColor3f(1, 0.843, 0);
+    gluPartialDisk(p, 70, 90, 100, 100, 0, 40);
+    glColor3f(1, 0.549, 0);
+    gluPartialDisk(p, 70, 90, 100, 100, 40, 40);
+    glColor3f(1, 0.271, 0);
+    gluPartialDisk(p, 70, 90, 100, 100, 80, 40);
+  
+    float nt = 220;
+    float nAngle = (200/1000.0) * (abs(speed*130));
+  
+    if (nAngle < 220) {
+        nt = 220 - nAngle;
+    } else {
+        nt = 340;
+    }    
+
+    glColor3f(0, 0, 1);
+
+    glLineWidth(5);
+
+    glBegin(GL_LINES);{
+        glVertex3f(1,0,0);
+        glVertex3f(80*cos(nt*3.14/180),80*sin(nt*3.14/180),0.5);
+    }glEnd();
+
+    char speed_value[32];
+    sprintf(speed_value, "%.0f", speed*22);
+    glColor3f(0, 0, 0);
+    glRasterPos3f(-20, 20 ,0);
+    for(int i = 0; speed_value[i] != '\0'; i++) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, speed_value[i]);
+    }
+}
+
+void drawHUD(double speed) {
+    // setup viewing projection
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glOrtho(-550.0, 550.0, -550.0, 550.0, -1.0, 1.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    HUD(speed);
+
+    //set 3D matrix mode back
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+}
