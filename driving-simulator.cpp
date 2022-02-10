@@ -358,6 +358,7 @@ void display() {
     drawMainCar(leftRightMove, car);
     drawBackground(sky);
     drawHill(sky);
+    drawHUD(speed);
     glutSwapBuffers();
 }
 
