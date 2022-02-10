@@ -475,9 +475,9 @@ double deceleration(double speed_x) {
     if (speed_x > 0.08) {
         ret = (speed_x * 0.95);
     } else {
-        ret += speed_x - 0.2 * COEFF;
+        ret = speed_x - 0.2 * COEFF;
         if (ret < -5.0)
-            return -5.0;
+            ret = -5.0;
     }
     return ret;
 }
