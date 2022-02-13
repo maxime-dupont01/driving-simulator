@@ -76,6 +76,7 @@ void drawBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<d
                 double z, double r, double g, double b);
 void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4);
 
+
 /* Odometer */
 void HUD(double speed);
 void drawHUD(double speed);

@@ -14,7 +14,10 @@ float lx=0.0f,lz=-1.0f; // actual vector representing the camera's direction
 double leftRightMove = 0;
 double sky = -1000;
 double speed = 0.0;
+time_t oldTime_fps;
 time_t oldTime;
+int fps = 0;
+
 
 // The different windows
 int winMenu, winGuide, winRun;
@@ -64,6 +67,16 @@ int main(int argc, char **argv){
 car_coord coord_car;
 
 void display() {
+    // get FPS :
+    ++fps;
+    time_t temp = time(NULL);
+    unsigned long diff_second = (unsigned long) difftime(temp, oldTime_fps);
+    if(diff_second >= 1){
+        oldTime_fps = temp;
+        //printf("FPS=%i\n", fps);
+        fps = 0;
+    }
+
     //clear the display
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(.345, 0.4, 0,0);	//color black
@@ -367,26 +380,21 @@ void animate() {
     //angle += 0.05;
     glutPostRedisplay();
 
-    //TODO Update pos x of car
-    //  Using equation speed = distance / time ?
-    //  To get time :
-    /*
-    static int nb = 0;
+    //To get time :
     time_t temp = time(NULL);
-    unsigned long secondes = (unsigned long) difftime(temp, oldTime);
-    if(secondes >= 1){
+    unsigned long diff_second = (unsigned long) difftime(temp, oldTime);
+    if(diff_second >= 1){
         oldTime = temp;
-        ++nb;
-        //printf("%i\n", nb);
+
+        // Try to get the position
+        /*if(speed >= 0){
+            coord_car.fl.y +=
+        } else {
+            coord_car.fl.y -=
+        }*/
     }
-     */
 
-    //printf("car=[%f, %f, %f]\n", coord_car.bl.x, coord_car.bl.y, coord_car.bl.z);
-
-    /* Collision detection */
-
-    // in specialKeyListener
-
+    //printf("pos : [%f, %f]\n", coord_car.fl.x, coord_car.fl.y);
 }
 
 void init() {
@@ -486,11 +494,6 @@ void specialKeyListener(int key, int x,int y) {
     double alpha = 1.5;
     switch(key) {
         case GLUT_KEY_DOWN:
-            /*if((coord_car.bl.y >= 0) || (coord_car.br.y >= 0)){
-                speed = 0;
-                break;
-            }*/
-
             speed = deceleration(speed);
             car += speed;
             Y += speed;
@@ -499,20 +502,12 @@ void specialKeyListener(int key, int x,int y) {
             break;
 
         case GLUT_KEY_UP:
-            /*if((coord_car.bl.y <= -2500) || (coord_car.br.y <= -2500)){
-                speed = 0;
-                break;
-            }*/
-
             speed = acceleration(speed);
-
             car -= speed;
             Y -= speed;
             X -= speed;
-
             sky -= speed;
             y_font -= speed;
-
             break;
 
         case GLUT_KEY_RIGHT:
@@ -567,14 +562,6 @@ void specialKeyListener(int key, int x,int y) {
             break;
 
     }
-
-
-    /*
-    if (speed > 0)
-        std::cout << "vitesse : " << speed << std::endl;
-    else
-        std::cout << "vitesse en arrière : " << abs(speed) << std::endl;
-    */
 }
 
 
