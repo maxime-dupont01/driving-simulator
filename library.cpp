@@ -211,20 +211,22 @@ void drawObstacle() {
 
     glTranslatef(0,0,3);
 
+    int nb = -400;
+
     //Front side
     glBegin(GL_QUADS);{
-        glVertex3f( 3, -100,-30);
-        glVertex3f( 3,-100,-10);
-        glVertex3f(-3,-100,-10);
-        glVertex3f(-3, -100,-30);
+        glVertex3f( 3, -100+nb,-30);
+        glVertex3f( 3,-100+nb,-10);
+        glVertex3f(-3,-100+nb,-10);
+        glVertex3f(-3, -100+nb,-30);
     }glEnd();
 
     //Top side
     glBegin(GL_QUADS);{
-        glVertex3f( 3, -100,-10);
-        glVertex3f( 3,-105,-10);
-        glVertex3f(-3,-105,-10);
-        glVertex3f(-3, -100,-10);
+        glVertex3f( 3, -100+nb,-10);
+        glVertex3f( 3,-105+nb,-10);
+        glVertex3f(-3,-105+nb,-10);
+        glVertex3f(-3, -100+nb,-10);
     }glEnd();
 
     glPopMatrix();
@@ -264,7 +266,7 @@ void drawRoad() {
     glPopMatrix();
 
     //drawBarrier();
-    //drawObstacle();
+    drawObstacle();
     //drawTest();
 }
 

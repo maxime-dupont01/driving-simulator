@@ -377,24 +377,27 @@ void display() {
 }
 
 void animate() {
+    double ratio = 20/sqrt(2);
     //angle += 0.05;
     glutPostRedisplay();
 
     //To get time :
     time_t temp = time(NULL);
     unsigned long diff_second = (unsigned long) difftime(temp, oldTime);
-    if(diff_second >= 1){
+    /*if(diff_second >= 1){
         oldTime = temp;
 
         // Try to get the position
-        /*if(speed >= 0){
-            coord_car.fl.y +=
-        } else {
-            coord_car.fl.y -=
-        }*/
-    }
+        coord_car.bl.y -= diff_second * speed * ratio;
+    }*/
 
-    //printf("pos : [%f, %f]\n", coord_car.fl.x, coord_car.fl.y);
+    oldTime = temp;
+    // Try to get the position
+    coord_car.bl.y -= diff_second * speed * ratio;
+
+
+    printf("pos : [%f, %f]\n", coord_car.bl.x, coord_car.bl.y);
+
 }
 
 void init() {
