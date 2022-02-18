@@ -17,6 +17,7 @@ double speed = 0.0;
 time_t oldTime_fps;
 time_t oldTime;
 int fps = 0;
+unsigned int state = 0;
 
 
 // The different windows
@@ -34,6 +35,7 @@ int main(int argc, char **argv){
     glutDisplayFunc(renderMenu);
     glutReshapeFunc(stopReshape);
     glutMouseFunc(mouseMenu);
+    glutHideWindow();
 
     // Window and callback functions for Guide
     winGuide = glutCreateWindow("Guide");
@@ -49,9 +51,10 @@ int main(int argc, char **argv){
     glutIdleFunc(animate);
     glutSpecialFunc(specialKeyListener);
     glutKeyboardFunc(keyboardListener);
-    glutHideWindow();
+    //glutHideWindow();
 
     init();
+
 
     glEnable(GL_DEPTH_TEST);
     /*glEnable(GL_CULL_FACE);
@@ -92,7 +95,41 @@ void display() {
     //initialize the matrix
     glLoadIdentity();
 
-    gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+
+    double delta = 0.2;
+    switch (state) {
+        case 0:
+            gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+            break;
+        case 1:
+            gluLookAt(delta,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+            state = 2;
+            break;
+        case 2:
+            gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+            state = 3;
+            break;
+        case 3:
+            gluLookAt(-delta,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+            state = 4;
+            break;
+        case 4:
+            gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+            state = 5;
+            break;
+        case 5:
+            gluLookAt(delta,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+            state = 6;
+            break;
+        case 6:
+            gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+            state = 7;
+            break;
+        case 7:
+            gluLookAt(-delta,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+            state = 0;
+            break;
+    }
 
     glMatrixMode(GL_MODELVIEW);
 
@@ -396,7 +433,7 @@ void animate() {
     coord_car.bl.y -= diff_second * speed * ratio;
 
 
-    printf("pos : [%f, %f]\n", coord_car.bl.x, coord_car.bl.y);
+    //printf("pos : [%f, %f]\n", coord_car.bl.x, coord_car.bl.y);
 
 }
 
@@ -515,6 +552,7 @@ void specialKeyListener(int key, int x,int y) {
 
         case GLUT_KEY_RIGHT:
             if(coord_car.fr.x <= -100){
+                state = 1;
                 speed = 0;
                 break;
             }
@@ -535,6 +573,7 @@ void specialKeyListener(int key, int x,int y) {
 
         case GLUT_KEY_LEFT:
             if(coord_car.fl.x >= 100){
+                state = 1;
                 speed = 0;
                 break;
             }
