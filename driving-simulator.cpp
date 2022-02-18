@@ -17,7 +17,7 @@ double speed = 0.0;
 time_t oldTime_fps;
 time_t oldTime;
 int fps = 0;
-unsigned int state = 0;
+unsigned int state = 0; // different than 0 for shake camera
 
 
 // The different windows
