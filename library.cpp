@@ -34,14 +34,23 @@ void mouseMenu(int button, int state, int x, int y) {
             glutHideWindow();
             glutSetWindow(winRun);
             glutShowWindow();
+
+            // play main sound
+            soundEngine->play2D("./irrKlang/media/getout.ogg", true, false, true);
+            if(soundEngine) {
+                soundEngine->setSoundVolume(0.5f);
+            }
+
         } else if( (x > 110) && (x < 240) && (y > 368) && (y < 403) ) {
             //Guide
             glutHideWindow();
             glutSetWindow(winGuide);
             glutShowWindow();
+
         } else if( (x > 110) && (x < 200) && (y > 430) && (y < 460) ) {
             //Quit
             glutLeaveMainLoop();
+
         } else if( (x > 110) && (x < 200) && (y > 490) && (y < 520) ) {
             //Credits
         }

@@ -19,9 +19,10 @@ time_t oldTime;
 int fps = 0;
 unsigned int state = 0; // different than 0 for shake camera
 
-
 // The different windows
 int winMenu, winGuide, winRun;
+
+ISoundEngine* soundEngine; //for sound
 
 int main(int argc, char **argv){
     glutInit(&argc,argv);
@@ -35,7 +36,7 @@ int main(int argc, char **argv){
     glutDisplayFunc(renderMenu);
     glutReshapeFunc(stopReshape);
     glutMouseFunc(mouseMenu);
-    glutHideWindow();
+    //glutHideWindow();
 
     // Window and callback functions for Guide
     winGuide = glutCreateWindow("Guide");
@@ -51,17 +52,25 @@ int main(int argc, char **argv){
     glutIdleFunc(animate);
     glutSpecialFunc(specialKeyListener);
     glutKeyboardFunc(keyboardListener);
-    //glutHideWindow();
+    glutHideWindow();
 
     init();
 
+    // start the sound engine with default parameters
+    soundEngine = createIrrKlangDevice();
+    if (!soundEngine){
+        printf("Could not startup soundEngine\n");
+    }
 
     glEnable(GL_DEPTH_TEST);
     /*glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_CLAMP);*/
 
-
     glutMainLoop();
+
+    if(soundEngine) {
+        soundEngine->drop(); // delete soundEngine
+    }
 
     return 0;
 }
@@ -552,6 +561,10 @@ void specialKeyListener(int key, int x,int y) {
 
         case GLUT_KEY_RIGHT:
             if(coord_car.fr.x <= -100){
+                soundEngine->play2D("./irrKlang/media/explosion.wav", false);
+                if(soundEngine) {
+                    soundEngine->setSoundVolume(0.05f);
+                }
                 state = 1;
                 speed = 0;
                 break;
@@ -573,6 +586,10 @@ void specialKeyListener(int key, int x,int y) {
 
         case GLUT_KEY_LEFT:
             if(coord_car.fl.x >= 100){
+                soundEngine->play2D("./irrKlang/media/explosion.wav", false);
+                if(soundEngine) {
+                    soundEngine->setSoundVolume(0.05f);
+                }
                 state = 1;
                 speed = 0;
                 break;
@@ -613,6 +630,7 @@ void keyboardListener(unsigned char Key, int x, int y){
             glutHideWindow();
             glutSetWindow(winMenu);
             glutShowWindow();
+            soundEngine->stopAllSounds();
             break;
     }
 }

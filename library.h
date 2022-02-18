@@ -8,14 +8,22 @@
 #include <GL/freeglut.h>
 #include <time.h>
 #include <array>
+#include <stdio.h>
+#include <irrKlang.h> // for sound
+#include "./irrKlang/conio.h" //same
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
 #define WINDOW_W_H_RUN 900
 #define pi (2*acos(0.0))
 
+using namespace irrklang;
+#pragma comment(lib, "irrKlang.lib") // link with irrKlang.dll
+
 // The different windows
 extern int winMenu, winGuide, winRun;
+
+extern ISoundEngine* soundEngine; //for sound
 
 struct point {
     double x, y, z;
