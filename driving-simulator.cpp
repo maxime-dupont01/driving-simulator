@@ -96,7 +96,7 @@ void display() {
     glLoadIdentity();
 
 
-    double delta = 0.2;
+    double delta = 0.3;
     switch (state) {
         case 0:
             gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
