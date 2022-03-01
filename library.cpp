@@ -187,6 +187,7 @@ void drawCircle(double radius, int segments) {
     }
 }
 
+//not used for the moment
 void drawBarrier() {
     glPushMatrix();
     glColor3f(0.184, 0.109, 0.13);
@@ -214,6 +215,7 @@ void drawBarrier() {
     glPopMatrix();
 }
 
+//not used for the moment
 void drawObstacle() {
     glPushMatrix();
     glColor3f(0.184, 0.109, 0.13);
@@ -275,7 +277,7 @@ void drawRoad() {
     glPopMatrix();
 
     //drawBarrier();
-    drawObstacle();
+    //drawObstacle();
     //drawTest();
 }
 

@@ -101,7 +101,7 @@ void display() {
     unsigned long diff_second = (unsigned long) difftime(temp, oldTime_fps);
     if(diff_second >= 1){
         oldTime_fps = temp;
-        //printf("FPS=%i\n", fps);
+        printf("FPS=%i\n", fps);
         fps = 0;
     }
 
@@ -183,7 +183,22 @@ void display() {
 
     drawRoadBezier(p1, p2, p3, p4);
 
+    drawRoad();
+    drawRoadMiddle();
+    drawMainCar(leftRightMove, car);
+    drawBackground(sky);
+    drawHill(sky);
+    drawHUD(speed);
+    glutSwapBuffers();
+
+
+    /**
+     * Before : construction of objects
+     */
+
+    /*
     if(abs(car) <= 1500) {
+
         for(int i = 0, j = 0; i <= 10; i++, j += 200) {
             if(i <= 5) {
                 glPushMatrix();{
@@ -286,11 +301,11 @@ void display() {
             }
         }
 
+
         drawRoad();
         drawRoadMiddle();
 
-    }
-    /*else if (abs(car) <= 2000) {
+    } else if (abs(car) <= 2000) {
         for(int i = 0, j = 0; i <= 15; i++, j += 200) {
             glPushMatrix();
             glTranslatef(-120,-j,0);
@@ -418,18 +433,15 @@ void display() {
         glVertex3f(2,-1700,-30);
         glEnd();
         glPopMatrix();
-    }*/
+    }
+     */
+
 /*
     drawCircle(900, -2500, -29,0.245, 0.245, 0.245, 1000, 100); // right road
     drawCircle(900, -2500, -28.9,1, 1, 1, 902, 100); // middle road
     drawCircle(900, -2500, -28.8,0.245, 0.245, 0.245, 898, 100); // left road
     drawCircle(900, -2500, -28.7,.345, 0.4, 0, 800, 100); // ellipse with background color*/
 
-    drawMainCar(leftRightMove, car);
-    drawBackground(sky);
-    drawHill(sky);
-    drawHUD(speed);
-    glutSwapBuffers();
 }
 
 void animate() {
