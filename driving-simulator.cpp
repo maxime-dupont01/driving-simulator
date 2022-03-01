@@ -18,11 +18,18 @@ time_t oldTime_fps;
 time_t oldTime;
 int fps = 0;
 unsigned int state = 0; // different than 0 for shake camera
+double alpha = 1.5; //proportion for position determination
 
 // The different windows
 int winMenu, winGuide, winRun;
 
+//point l, u, r;
+car_coord coord_car;
+
 ISoundEngine* soundEngine; //for sound
+ISoundEngine* soundEngine_effets; //for sound for effets
+
+keys_use keys;
 
 int main(int argc, char **argv){
     glutInit(&argc,argv);
@@ -50,16 +57,22 @@ int main(int argc, char **argv){
     winRun = glutCreateWindow("car driving test");
     glutDisplayFunc(display);
     glutIdleFunc(animate);
-    glutSpecialFunc(specialKeyListener);
     glutKeyboardFunc(keyboardListener);
+    glutSpecialFunc(specialKeyListener);
+    glutSpecialUpFunc(specialUpListener);
+    //glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
     glutHideWindow();
 
     init();
 
-    // start the sound engine with default parameters
+    // start the sound engines with default parameters
     soundEngine = createIrrKlangDevice();
     if (!soundEngine){
         printf("Could not startup soundEngine\n");
+    }
+    soundEngine_effets = createIrrKlangDevice();
+    if (!soundEngine_effets){
+        printf("Could not startup soundEngine for effects\n");
     }
 
     glEnable(GL_DEPTH_TEST);
@@ -68,15 +81,18 @@ int main(int argc, char **argv){
 
     glutMainLoop();
 
+    /* End of programme */
+
     if(soundEngine) {
         soundEngine->drop(); // delete soundEngine
     }
+    if(soundEngine_effets) {
+        soundEngine_effets->drop(); // delete soundEngine effects
+    }
+    //glutSetKeyRepeat(GLUT_KEY_REPEAT_ON);
 
     return 0;
 }
-
-//point l, u, r;
-car_coord coord_car;
 
 void display() {
     // get FPS :
@@ -94,9 +110,9 @@ void display() {
     glClearColor(.345, 0.4, 0,0);	//color black
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    /********************
-        camera setup
-    ********************/
+        /********************
+            camera setup
+        ********************/
 
     //load the correct matrix -- MODEL-VIEW matrix
     glMatrixMode(GL_MODELVIEW);
@@ -105,6 +121,7 @@ void display() {
     glLoadIdentity();
 
 
+    // animation is case of collision -> shake the camera
     double delta = 0.3;
     switch (state) {
         case 0:
@@ -147,13 +164,6 @@ void display() {
     sky -= speed;
     speed *= 0.98;
 
-    /*
-    std::string s = "speed : " + std::to_string(speed);
-    s.pop_back();s.pop_back();s.pop_back();s.pop_back();s.pop_back();
-    char *str = &s[0];
-    y_font -= speed;
-    output(x_font, y_font, str);
-     */
 
     /* ajout des 4 points nécessaires à la construction de la route de bezier */
     // premiere portion
@@ -423,6 +433,70 @@ void display() {
 }
 
 void animate() {
+
+    /*******************
+         key listeners
+      ******************/
+
+    if(keys.IS_KEY_UP) {
+        speed = acceleration(speed);
+        car -= speed;
+        Y -= speed;
+        X -= speed;
+        sky -= speed;
+        y_font -= speed;
+    }
+    if(keys.IS_KEY_DOWN) {
+        speed = deceleration(speed);
+        car += speed;
+        Y += speed;
+        X += speed;
+        sky += speed;
+    }
+    if(keys.IS_KEY_LEFT) {
+        if (coord_car.fl.x >= 100) {
+            soundEngine_effets->play2D("./irrKlang/media/metal.wav", false);
+            if (soundEngine_effets) {
+                soundEngine_effets->setSoundVolume(0.1f);
+            }
+            state = 1;
+            speed = 0;
+        } else {
+            leftRightMove += 0.5;
+            //cameraAngle -= 0.03;
+
+            coord_car.fl.x += alpha;
+            coord_car.fr.x += alpha;
+            coord_car.bl.x += alpha;
+            coord_car.br.x += alpha;
+        }
+    }
+    if(keys.IS_KEY_RIGHT) {
+        if (coord_car.fr.x <= -100) {
+            soundEngine_effets->play2D("./irrKlang/media/metal.wav", false);
+            if (soundEngine_effets) {
+                soundEngine_effets->setSoundVolume(0.1f);
+            }
+            state = 1;
+            speed = 0;
+        } else {
+            glRotatef(1, 0.0, 1.0, 0.0);
+            glRotatef(1, 0.0, -1.0, 0.0);
+            glTranslatef(2.0, 0.0, 0.0);
+
+            leftRightMove -= 0.5;
+            //cameraAngle += 0.03;
+
+            coord_car.fl.x -= alpha;
+            coord_car.fr.x -= alpha;
+            coord_car.bl.x -= alpha;
+            coord_car.br.x -= alpha;
+        }
+    }
+
+
+
+
     double ratio = 20/sqrt(2);
     //angle += 0.05;
     glutPostRedisplay();
@@ -540,73 +614,24 @@ double deceleration(double speed_x) {
 }
 
 void specialKeyListener(int key, int x,int y) {
-    double alpha = 1.5;
     switch(key) {
-        case GLUT_KEY_DOWN:
-            speed = deceleration(speed);
-            car += speed;
-            Y += speed;
-            X += speed;
-            sky += speed;
-            break;
-
         case GLUT_KEY_UP:
-            speed = acceleration(speed);
-            car -= speed;
-            Y -= speed;
-            X -= speed;
-            sky -= speed;
-            y_font -= speed;
+            keys.IS_KEY_UP = true;
             break;
 
-        case GLUT_KEY_RIGHT:
-            if(coord_car.fr.x <= -100){
-                soundEngine->play2D("./irrKlang/media/explosion.wav", false);
-                if(soundEngine) {
-                    soundEngine->setSoundVolume(0.05f);
-                }
-                state = 1;
-                speed = 0;
-                break;
-            }
-
-            glRotatef(1, 0.0, 1.0, 0.0);
-            glRotatef(1, 0.0, -1.0, 0.0);
-            glTranslatef(2.0, 0.0, 0.0);
-
-            leftRightMove -= 0.5;
-            //cameraAngle += 0.03;
-
-            coord_car.fl.x -= alpha;
-            coord_car.fr.x -= alpha;
-            coord_car.bl.x -= alpha;
-            coord_car.br.x -= alpha;
-
+        case GLUT_KEY_DOWN:
+            keys.IS_KEY_DOWN = true;
             break;
 
         case GLUT_KEY_LEFT:
-            if(coord_car.fl.x >= 100){
-                soundEngine->play2D("./irrKlang/media/explosion.wav", false);
-                if(soundEngine) {
-                    soundEngine->setSoundVolume(0.05f);
-                }
-                state = 1;
-                speed = 0;
-                break;
-            }
-
-            leftRightMove += 0.5;
-            //cameraAngle -= 0.03;
-
-            coord_car.fl.x += alpha;
-            coord_car.fr.x += alpha;
-            coord_car.bl.x += alpha;
-            coord_car.br.x += alpha;
-
+            keys.IS_KEY_LEFT = true;
             break;
 
+        case GLUT_KEY_RIGHT:
+            keys.IS_KEY_RIGHT = true;
+            break;
 
-            //UP AND DOWN -> mouvement de la caméra
+        //UP AND DOWN -> mouvement de la caméra
         case GLUT_KEY_PAGE_UP :
 
             cameraAngle += 0.03;
@@ -619,10 +644,28 @@ void specialKeyListener(int key, int x,int y) {
             lx = sin(cameraAngle);
             lz = -cos(cameraAngle);
             break;
-
     }
 }
 
+void specialUpListener(int key, int x, int y){
+    switch(key){
+        case GLUT_KEY_UP :
+            keys.IS_KEY_UP = false;
+            break;
+
+        case GLUT_KEY_DOWN :
+            keys.IS_KEY_DOWN = false;
+            break;
+
+        case GLUT_KEY_LEFT :
+            keys.IS_KEY_LEFT = false;
+            break;
+
+        case GLUT_KEY_RIGHT :
+            keys.IS_KEY_RIGHT = false;
+            break;
+    }
+}
 
 void keyboardListener(unsigned char Key, int x, int y){
     switch(Key){

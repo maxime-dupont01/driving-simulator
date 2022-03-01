@@ -24,6 +24,7 @@ using namespace irrklang;
 extern int winMenu, winGuide, winRun;
 
 extern ISoundEngine* soundEngine; //for sound
+extern ISoundEngine* soundEngine_effets; //for sound for effets
 
 struct point {
     double x, y, z;
@@ -36,6 +37,12 @@ struct car_coord { // considered as square and not cube
     br; // back-right
 };
 
+struct keys_use {
+    bool IS_KEY_UP = false,
+    IS_KEY_DOWN = false,
+    IS_KEY_LEFT = false,
+    IS_KEY_RIGHT = false;
+};
 
 /* Menu */
 void renderMenu();
@@ -59,6 +66,7 @@ void animate();
 void init();
 void specialKeyListener(int key, int x,int y);
 void keyboardListener(unsigned char Key, int x, int y);
+void specialUpListener(int key, int x, int y);
 
 
 double acceleration (double speed_x);
