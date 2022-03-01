@@ -101,7 +101,7 @@ void display() {
     unsigned long diff_second = (unsigned long) difftime(temp, oldTime_fps);
     if(diff_second >= 1){
         oldTime_fps = temp;
-        printf("FPS=%i\n", fps);
+        //printf("FPS=%i\n", fps);
         fps = 0;
     }
 
@@ -466,6 +466,7 @@ void animate() {
         sky += speed;
     }
     if(keys.IS_KEY_LEFT) {
+        /*
         if (coord_car.fl.x >= 100) {
             soundEngine_effets->play2D("./irrKlang/media/metal.wav", false);
             if (soundEngine_effets) {
@@ -482,8 +483,17 @@ void animate() {
             coord_car.bl.x += alpha;
             coord_car.br.x += alpha;
         }
+         */
+        leftRightMove += 0.5;
+        //cameraAngle -= 0.03;
+
+        coord_car.fl.x += alpha;
+        coord_car.fr.x += alpha;
+        coord_car.bl.x += alpha;
+        coord_car.br.x += alpha;
     }
     if(keys.IS_KEY_RIGHT) {
+        /*
         if (coord_car.fr.x <= -100) {
             soundEngine_effets->play2D("./irrKlang/media/metal.wav", false);
             if (soundEngine_effets) {
@@ -504,8 +514,19 @@ void animate() {
             coord_car.bl.x -= alpha;
             coord_car.br.x -= alpha;
         }
-    }
+        */
+        glRotatef(1, 0.0, 1.0, 0.0);
+        glRotatef(1, 0.0, -1.0, 0.0);
+        glTranslatef(2.0, 0.0, 0.0);
 
+        leftRightMove -= 0.5;
+        //cameraAngle += 0.03;
+
+        coord_car.fl.x -= alpha;
+        coord_car.fr.x -= alpha;
+        coord_car.bl.x -= alpha;
+        coord_car.br.x -= alpha;
+    }
 
 
 
