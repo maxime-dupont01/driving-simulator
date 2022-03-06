@@ -8,6 +8,7 @@
 #include <GL/freeglut.h>
 #include <time.h>
 #include <array>
+#include <vector>
 #include <stdio.h>
 #include <irrKlang.h> // for sound
 #include "./irrKlang/conio.h" //same
@@ -85,12 +86,20 @@ void drawRoadMiddle();
 void drawMainCar(double leftRightMove, double car);
 void drawBackground(double sky);
 void drawHill(double sky);
-void drawLine(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, double z);
-std::array<double, 2> drawBezierGeneralized(std::array<std::array<double, 2>,4> PT, double t, double z_);
+
+void drawLine(std::pair<double,double> p1, std::pair<double, double> p2, std::pair<double, double> p3, double z);
+
+void drawPolygonsFromVectors(std::vector<std::pair<double,double>> v, double z, double r, double g, double b);
+
+std::pair<double, double> drawBezierGeneralized(std::array<std::array<double, 2>,4> PT, double t);
+
 void drawBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4,
                 std::array<double, 2> p5, std::array<double, 2> p6, std::array<double, 2> p7, std::array<double, 2> p8,
-                double z, double r, double g, double b);
-void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4);
+                double z, double r, double g, double b, std::vector<std::pair<double, double>>& ret);
+
+void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4,
+                    std::array<double, 2> p5, std::array<double, 2> p6, std::array<double, 2> p7, std::array<double, 2> p8,
+                    std::vector<std::pair<double, double>>& roads, std::vector<std::pair<double, double>>& middle_roads);
 
 
 /* Odometer */

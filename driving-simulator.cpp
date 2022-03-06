@@ -1,4 +1,5 @@
 #include "library.h"
+#include "Circuit.h"
 
 #define MAXSPEED 20.0
 #define COEFF 1
@@ -19,7 +20,14 @@ time_t oldTime;
 int fps = 0;
 unsigned int state = 0; // different than 0 for shake camera
 double alpha = 1.5; //proportion for position determination
+double RATIO = 4.0;
+double x_rename = 0.0;
+double y_rename = 0.0;
+std::vector<std::pair<double,double>> roads; // vector of pairs containing x and y informations on the the roads' points.
+std::vector<std::pair<double,double>> middle_roads; //same but for the white line on the road
 
+
+bool turned = false;
 // The different windows
 int winMenu, winGuide, winRun;
 
@@ -101,7 +109,7 @@ void display() {
     unsigned long diff_second = (unsigned long) difftime(temp, oldTime_fps);
     if(diff_second >= 1){
         oldTime_fps = temp;
-        //printf("FPS=%i\n", fps);
+        printf("FPS=%i\n", fps);
         fps = 0;
     }
 
@@ -167,7 +175,7 @@ void display() {
 
     /* ajout des 4 points nécessaires à la construction de la route de bezier */
     // premiere portion
-    std::array<double, 2> p1, p2, p3, p4;
+   /* std::array<double, 2> p1, p2, p3, p4;
     p1[0] = 100.0; p1[1] = -2500.0;
     p2[0] = 120.0; p2[1] = -3200.0;
     p3[0] = 250.0; p3[1] = -3800.0;
@@ -181,266 +189,44 @@ void display() {
     p3[0] = -200.0; p3[1] = -4800.0;
     p4[0] = 500.0; p4[1] = -5000.0;
 
-    drawRoadBezier(p1, p2, p3, p4);
+    drawRoadBezier(p1, p2, p3, p4);*/
 
-    drawRoad();
-    drawRoadMiddle();
+    std::array<double, 2> p1, p2, p3, p4, g1, g2, g3, g4;
+
+    //first portion of the road
+    p1[0] = (0.0 + x_rename) * RATIO; p1[1] = (0.0 + y_rename) * RATIO;
+    p2[0] = (100.0 + x_rename) * RATIO; p2[1] = (-100.0 + y_rename) * RATIO;
+    p3[0] = (200.0 + x_rename) * RATIO; p3[1] = (-100.0 + y_rename) * RATIO;
+    p4[0] = (300.0 + x_rename) * RATIO; p4[1] = (0.0 + y_rename) * RATIO;
+
+    g1[0] = (-100.0 + x_rename) * RATIO; g1[1] = (0.0 + y_rename) * RATIO;
+    g2[0] = (50.0 + x_rename) * RATIO; g2[1] = (-200.0 + y_rename) * RATIO;
+    g3[0] = (250.0 + x_rename) * RATIO; g3[1] = (-200.0 + y_rename) * RATIO;
+    g4[0] = (400.0 + x_rename) * RATIO; g4[1] = (0.0 + y_rename) * RATIO;
+
+
+    //print both matrices once only
+    if (!turned) {
+
+        drawRoadBezier(p1, p2, p3, p4, g1, g2, g3, g4, roads, middle_roads); //initialise the circuit ?
+
+        for (auto it = roads.begin(); it != roads.end(); ++it) {
+            std::cout << "\t" << it->first << " \t" << it->second << "\n";
+        }
+        std::cout << "\n\n";
+        for (auto it = middle_roads.begin(); it != middle_roads.end(); ++it) {
+            std::cout << "\t" << it->first << " \t" << it->second << "\n";
+        }
+        turned = true;
+    }
+    drawPolygonsFromVectors(roads, -30.0, 0.245, 0.245, 0.245);
+    drawPolygonsFromVectors(middle_roads, -29.80, 1, 1, 1);
+
     drawMainCar(leftRightMove, car);
     drawBackground(sky);
     drawHill(sky);
     drawHUD(speed);
     glutSwapBuffers();
-
-
-    /**
-     * Before : construction of objects
-     */
-
-    /*
-    if(abs(car) <= 1500) {
-
-        for(int i = 0, j = 0; i <= 10; i++, j += 200) {
-            if(i <= 5) {
-                glPushMatrix();{
-                    glTranslatef(-120,-j,0);
-                    glPushMatrix();{
-                        glTranslatef(0,0,0);
-                        glColor3f(.6,.6,.6);
-                        glRotatef(90,1,0,0);
-                        glutSolidCube(50);
-                    }glPopMatrix();
-
-                    glPushMatrix();{
-                        glTranslatef(0,0,20);
-                        glColor3f(.6,.6,0);
-                        glutSolidCone(40,30,30,40);
-                    }glPopMatrix();
-                }glPopMatrix();
-            } else {
-                glPushMatrix();{
-                    glTranslatef(-120,-j,0);
-                    glPushMatrix();{
-                        glColor3f(0,1,0);
-                        glutSolidCone(20,30,20,20);
-                    }glPopMatrix();
-
-                    glPushMatrix();{
-                        glColor3f(.5,.5,.3);
-                        glScalef(.01,.4,5);
-                        glutSolidSphere(7,10,10);
-                    }glPopMatrix();
-                }glPopMatrix();
-            }
-        }
-
-        for(int i = 0, j = 0; i <= 10; i++, j += 200) {
-            if(i <= 4) {
-                glPushMatrix();{
-                    glColor3f(.345,.78,0);
-                    glTranslatef(80,-j,-15);
-                    glTranslatef(0,55,0);
-                    glutSolidSphere(9,5,5);
-                }glPopMatrix();
-
-                glPushMatrix();{
-                    glTranslatef(120,-j,0);
-                    glPushMatrix();{
-                        glTranslatef(0,0,0);
-                        glColor3f(.6,.6,.6);
-                        glRotatef(90,1,0,0);
-                        glutSolidCube(50);
-                    }glPopMatrix();
-
-                    glPushMatrix();{
-                        glTranslatef(0,0,20);
-                        glColor3f(1,.6,0);
-                        glutSolidCone(40,30,30,40);
-                    }glPopMatrix();
-                }glPopMatrix();
-            } else if (i == 5) {
-                glPushMatrix();{
-                    glTranslatef(120,-j,0);
-                    glPushMatrix();{
-                        glColor3f(.5,.5,.3);
-                        glScalef(.01,.4,5);
-                        glutSolidSphere(7,10,10);
-                    }glPopMatrix();
-
-                    glPushMatrix();{
-                        glTranslatef(5,0,1);
-                        glColor3f(0,.5,.3);
-                        glutSolidSphere(10,10,10);
-                    }glPopMatrix();
-
-                    glPushMatrix();{
-                        glTranslatef(-5,0,1);
-                        glColor3f(0,.5,.3);
-                        glutSolidSphere(10,10,10);
-                    }glPopMatrix();
-
-                    glPushMatrix();{
-                        glTranslatef(0,0,20);
-                        glColor3f(0,.5,.2);
-                        glutSolidSphere(15,10,10);
-                    }glPopMatrix();
-                }glPopMatrix();
-            } else {
-                glPushMatrix();{
-                    glTranslatef(120,-j,0);
-                    glPushMatrix();{
-                        glColor3f(0,1,0);
-                        glutSolidCone(20,30,20,20);
-                    }glPopMatrix();
-
-                    glPushMatrix();{
-                        glColor3f(.5,.5,.3);
-                        glScalef(.01,.4,5);
-                        glutSolidSphere(7,10,10);
-                    }glPopMatrix();
-                }glPopMatrix();
-            }
-        }
-
-
-        drawRoad();
-        drawRoadMiddle();
-
-    } else if (abs(car) <= 2000) {
-        for(int i = 0, j = 0; i <= 15; i++, j += 200) {
-            glPushMatrix();
-            glTranslatef(-120,-j,0);
-            glPushMatrix();
-            glColor3f(0,1,0);
-            glutSolidCone(20,30,20,20);
-            glPopMatrix();
-
-            glPushMatrix();
-            glColor3f(.5,.5,.3);
-            glScalef(.01,.4,5);
-            glutSolidSphere(7,10,10);
-            glPopMatrix();
-            glPopMatrix();
-        }
-
-        for(int i = 0, j = 0; i <= 15; i++, j += 200) {
-            glPushMatrix();
-            glTranslatef(120,-j,0);
-            glPushMatrix();{
-                glTranslatef(0,0,0);
-                glColor3f(.6,.6,.6);
-                glRotatef(90,1,0,0);
-                glutSolidCube(50);
-            }glPopMatrix();
-
-            glPushMatrix();{
-                glTranslatef(0,0,20);
-                glColor3f(1,.6,0);
-                glutSolidCone(40,30,30,40);
-            }glPopMatrix();
-            glPopMatrix();
-        }
-
-        glPushMatrix();
-        glColor3f(1, 1, 1);
-        glTranslatef(0,0,3);
-
-        glBegin(GL_POLYGON);
-        glVertex3f(-2,0,-30);
-        glVertex3f(2,0,-30);
-        glVertex3f(-2,-2500,-30);
-        glVertex3f(2,-2500,-30);
-        glEnd();
-        glPopMatrix();
-
-        glPushMatrix();
-        glColor3f(0.245, 0.245, 0.245);
-
-        glBegin(GL_POLYGON);
-        glVertex3f(100,-1000,-30);
-        glVertex3f(-100,-1000,-30);
-        glVertex3f(-100,-2700,-30);
-        glVertex3f(100,-2700,-30);
-        glEnd();
-        glPopMatrix();
-    } else {
-        for(int i = 0, j = 2200; i <= 10; i++, j += 100) {
-            glPushMatrix();
-            glTranslatef(-120,-j,0);
-            glPushMatrix();{
-                glTranslatef(0,0,0);
-                glColor3f(.6,.6,.6);
-                glRotatef(90,1,0,0);
-                glutSolidCube(50);
-            }glPopMatrix();
-
-            glPushMatrix();{
-                glTranslatef(0,0,20);
-                glColor3f(.6,.6,0);
-                glutSolidCone(40,30,30,40);
-            }glPopMatrix();
-            glPopMatrix();
-        }
-
-        for(int i = 0, j = 2200; i <= 10; i++, j += 100) {
-            glPushMatrix();
-            glTranslatef(120,-j,0);
-            glPushMatrix();{
-                glTranslatef(0,0,0);
-                glColor3f(.6,.6,.6);
-                glRotatef(90,1,0,0);
-                glutSolidCube(50);
-            }glPopMatrix();
-
-            glPushMatrix();{
-                glTranslatef(0,0,20);
-                glColor3f(1,.6,0);
-                glutSolidCone(40,30,30,40);
-            }glPopMatrix();
-            glPopMatrix();
-        }
-
-        glPushMatrix();
-        glColor3f(1, 1, 1);
-        glTranslatef(0,0,3);
-
-        glBegin(GL_POLYGON);
-        glVertex3f(-2,-1800,-30);
-        glVertex3f(2,-1800,-30);
-        glVertex3f(-2,-4000,-30);
-        glVertex3f(2,-4000,-30);
-        glEnd();
-        glPopMatrix();
-
-        glPushMatrix();
-        glColor3f(0.245, 0.245, 0.245);
-
-        glBegin(GL_POLYGON);
-        glVertex3f(100,-2000,-30);
-        glVertex3f(-100,-2000,-30);
-        glVertex3f(-100,-4000,-30);
-        glVertex3f(100,-4000,-30);
-        glEnd();
-        glPopMatrix();
-
-        glPushMatrix();
-        glColor3f(1, 1, 1);
-        glTranslatef(0,0,3);
-
-        glBegin(GL_POLYGON);
-        glVertex3f(-2,0,-30);
-        glVertex3f(2,0,-30);
-        glVertex3f(-2,-1700,-30);
-        glVertex3f(2,-1700,-30);
-        glEnd();
-        glPopMatrix();
-    }
-     */
-
-/*
-    drawCircle(900, -2500, -29,0.245, 0.245, 0.245, 1000, 100); // right road
-    drawCircle(900, -2500, -28.9,1, 1, 1, 902, 100); // middle road
-    drawCircle(900, -2500, -28.8,0.245, 0.245, 0.245, 898, 100); // left road
-    drawCircle(900, -2500, -28.7,.345, 0.4, 0, 800, 100); // ellipse with background color*/
 
 }
 
@@ -484,7 +270,8 @@ void animate() {
             coord_car.br.x += alpha;
         }
          */
-        leftRightMove += 0.5;
+        leftRightMove += 3.5;
+        x_rename = leftRightMove;
         //cameraAngle -= 0.03;
 
         coord_car.fl.x += alpha;
@@ -519,7 +306,8 @@ void animate() {
         glRotatef(1, 0.0, -1.0, 0.0);
         glTranslatef(2.0, 0.0, 0.0);
 
-        leftRightMove -= 0.5;
+        leftRightMove -= 3.5;
+        x_rename = leftRightMove;
         //cameraAngle += 0.03;
 
         coord_car.fl.x -= alpha;

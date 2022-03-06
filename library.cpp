@@ -4,7 +4,7 @@
 #include <cstring>
 
 #include "library.h"
-
+#define PRECISION 0.15
 
 /**** Menu *****/
 void renderMenu() {
@@ -387,27 +387,27 @@ void drawHill(double sky) {
     }glPopMatrix();
 }
 
-void drawLine(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, double z) {
+void drawLine(std::pair<double,double> p1, std::pair<double, double> p2, std::pair<double, double> p3, double z) {
     glBegin(GL_TRIANGLES);
-    glVertex3f(p1[0], p1[1], z);
-    glVertex3f(p2[0], p2[1], z);
-    glVertex3f(p3[0], p3[1], z);
+    glVertex3f(p1.first, p1.second, z);
+    glVertex3f(p2.first, p2.second, z);
+    glVertex3f(p3.first, p3.second, z);
     glEnd();
     glFlush();
 }
 
-std::array<double, 2> drawBezierGeneralized(std::array<std::array<double, 2>,4> PT, double t, double z_) {
+std::pair<double, double> drawBezierGeneralized(std::array<std::array<double, 2>,4> PT, double t) {
 
-    double x = 0, y = 0, z = z_;
+    double x = 0, y = 0;
 
     for (int i = 0; i<4; i++) {
         x = x + binomial_coff((float)(4 /*number of points*/- 1), (float)i) * pow(t, (double)i) * pow((1 - t), (4 - 1 - i)) * PT[i][0];
         y = y + binomial_coff((float)(4 - 1), (float)i) * pow(t, (double)i) * pow((1 - t), (4 - 1 - i)) * PT[i][1];
     }
 
-    std::array<double, 2> ret;
-    ret[0] = x;
-    ret[1] = y;
+    std::pair<double, double> ret;
+    ret.first = x;
+    ret.second = y;
 
     //std::cout << "ret " << ret[0] << " " << ret[1] << " " << ret[2] << std::endl;
     return ret;
@@ -415,13 +415,7 @@ std::array<double, 2> drawBezierGeneralized(std::array<std::array<double, 2>,4> 
 
 void drawBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4,
                 std::array<double, 2> p5, std::array<double, 2> p6, std::array<double, 2> p7, std::array<double, 2> p8,
-                double z, double r, double g, double b){
-
-    glColor3f(1,0,0);
-
-    std::array<double, 2> p1_ = p1;
-    std::array<double, 2> p5_ = p5;
-    /* Draw each segment of the curve.Make t increment in smaller amounts for a more detailed curve.*/
+                std::vector<std::pair<double, double>>& ret){
 
     std::array<std::array<double, 2>,4> array1, array2;
 
@@ -429,45 +423,89 @@ void drawBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<d
     array1[1] = p2; array2[1] = p6;
     array1[2] = p3; array2[2] = p7;
     array1[3] = p4; array2[3] = p8;
-    glColor3f(r,g,b);
-    for(double t = 0.0;t <= 1.0; t += 0.02) {
-        std::array<double, 2> p2_ = drawBezierGeneralized(array1, t, z);
-        std::array<double, 2> p6_ = drawBezierGeneralized(array2,t, z);
-        drawLine(p1_, p5_, p2_, z);
-        drawLine(p5_, p2_, p6_, z);
-        p1_ = p2_;
-        p5_ = p6_;
-    }
 
-    glColor3f(r,g,b);
+    for(double t = 0.0;t <= 1.0; t += PRECISION) {
+        ret.push_back(drawBezierGeneralized(array1, t));
+        ret.push_back(drawBezierGeneralized(array2, t));
+    }
 }
 
-void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4) {
+void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4,
+                    std::array<double, 2> g1, std::array<double, 2> g2, std::array<double, 2> g3, std::array<double, 2> g4,
+                    std::vector<std::pair<double, double>>& roads, std::vector<std::pair<double, double>>& middle_roads) {
+
+    int witdh = 5;
     std::array<double, 2> f1, f2, f3, f4;
     f1[0] = p1[0]; f1[1] = p1[1];
     f2[0] = p2[0]; f2[1] = p2[1];
     f3[0] = p3[0]; f3[1] = p3[1];
     f4[0] = p4[0]; f4[1] = p4[1];
 
-    std::array<double, 2> g1, g2, g3, g4;
-    g1[0] = p1[0]-200; g1[1] = p1[1];
-    g2[0] = p2[0]-200; g2[1] = p2[1];
-    g3[0] = p3[0]-200; g3[1] = p3[1];
-    g4[0] = p4[0]-200; g4[1] = p4[1];
 
-    drawBezier(f1, f2, f3, f4, g1, g2, g3, g4, -30.0, 0.245, 0.245, 0.245);
+    drawBezier(f1, f2, f3, f4, g1, g2, g3, g4, roads);
 
-    f1[0] = p1[0]-98;
-    f2[0] = p2[0]-98;
-    f3[0] = p3[0]-98;
-    f4[0] = p4[0]-98;
+    std::array<double, 2> h1, h2, h3, h4;
 
-    g1[0] = p1[0]-102;
-    g2[0] = p2[0]-102;
-    g3[0] = p3[0]-102;
-    g4[0] = p4[0]-102;
-    drawBezier(f1, f2, f3, f4, g1, g2, g3, g4, -29.80, 1, 1, 1);
+    f1[0] = (p1[0] + g1[0] - witdh) / 2;    f1[1] = (p1[1] + g1[1] - witdh) / 2;
+    f2[0] = (p2[0] + g2[0] - witdh) / 2;    f2[1] = (p2[1] + g2[1] - witdh) / 2;
+    f3[0] = (p3[0] + g3[0] - witdh) / 2;    f3[1] = (p3[1] + g3[1] - witdh) / 2;
+    f4[0] = (p4[0] + g4[0] - witdh) / 2;    f4[1] = (p4[1] + g4[1] - witdh) / 2;
 
+    h1[0] = (p1[0] + g1[0] + witdh) / 2;    h1[1] = (p1[1] + g1[1] + witdh) / 2;
+    h2[0] = (p2[0] + g2[0] + witdh) / 2;    h2[1] = (p2[1] + g2[1] + witdh) / 2;
+    h3[0] = (p3[0] + g3[0] + witdh) / 2;    h3[1] = (p3[1] + g3[1] + witdh) / 2;
+    h4[0] = (p4[0] + g4[0] + witdh) / 2;    h4[1] = (p4[1] + g4[1] + witdh) / 2;
+
+    drawBezier(f1, f2, f3, f4, h1, h2, h3, h4, middle_roads);
+
+}
+
+//TODO mettre les points dans le bon ordre, en gros
+
+void drawPolygonsFromVectors(std::vector<std::pair<double,double>> v, double z, double r, double g, double b) {
+
+    glColor3f(r,g,b);
+    std::pair<double, double> p1, p2, p3, p4;
+    int i = 0;
+
+    for (auto it = v.begin(); it != v.end(); ++it) {
+
+        if (i < 4) { // first 4 points initialized
+            switch(i) {
+                case 0 : p1.first = it->first; p1.second = it->second; break;
+                case 1 : p2.first = it->first; p2.second = it->second; break;
+                case 2 : p3.first = it->first; p3.second = it->second; break;
+                case 3 : p4.first = it->first; p4.second = it->second; break;
+                default: ;
+            }
+        } else {
+
+            if (i % 2 == 0) {
+                if (i == 4) {
+                    drawLine(p1, p2, p3, z);
+                    drawLine(p2, p3, p4, z);
+                    p1 = p2;
+                    p2 = p4;
+                } else {
+                    p4.first = it->first;
+                    p4.second = it->second;
+                    drawLine(p1, p2, p3, z);
+                    drawLine(p2, p3, p4, z);
+                    p1 = p2;
+                    p2 = p4;
+                }
+            } else {
+                p3.first = it->first;
+                p3.second = it->second;
+            }
+        }
+        i++;
+        /*std::cout << " p1 = " << p1.first << ", " << p1.second << "\n";
+        std::cout << " p2 = " << p2.first << ", " << p2.second << "\n";
+        std::cout << " p3 = " << p3.first << ", " << p3.second << "\n";
+        std::cout << " p4 = " << p4.first << ", " << p4.second << "\n";*/
+    }
+    glColor3f(r,g,b);
 }
 
 void HUD(double speed) {
