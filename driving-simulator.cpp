@@ -20,7 +20,7 @@ time_t oldTime;
 int fps = 0;
 unsigned int state = 0; // different than 0 for shake camera
 double alpha = 1.5; //proportion for position determination
-double RATIO = 4.0;
+double RATIO = 1.7;
 double x_rename = 0.0;
 double y_rename = 0.0;
 std::vector<std::pair<double,double>> roads; // vector of pairs containing x and y informations on the the roads' points.
@@ -194,6 +194,7 @@ void display() {
     std::array<double, 2> p1, p2, p3, p4, g1, g2, g3, g4;
 
     //first portion of the road
+    /*
     p1[0] = (0.0 + x_rename) * RATIO; p1[1] = (0.0 + y_rename) * RATIO;
     p2[0] = (100.0 + x_rename) * RATIO; p2[1] = (-100.0 + y_rename) * RATIO;
     p3[0] = (200.0 + x_rename) * RATIO; p3[1] = (-100.0 + y_rename) * RATIO;
@@ -203,6 +204,18 @@ void display() {
     g2[0] = (50.0 + x_rename) * RATIO; g2[1] = (-200.0 + y_rename) * RATIO;
     g3[0] = (250.0 + x_rename) * RATIO; g3[1] = (-200.0 + y_rename) * RATIO;
     g4[0] = (400.0 + x_rename) * RATIO; g4[1] = (0.0 + y_rename) * RATIO;
+    */
+
+    //first portion of the road
+    p1[0] = (100.0 + x_rename) * RATIO; p1[1] = (0.0 + y_rename) * RATIO;
+    p2[0] = (100.0 + x_rename) * RATIO; p2[1] = (-100.0 + y_rename) * RATIO;
+    p3[0] = (100.0 + x_rename) * RATIO; p3[1] = (-200.0 + y_rename) * RATIO;
+    p4[0] = (100.0 + x_rename) * RATIO; p4[1] = (-300.0 + y_rename) * RATIO;
+
+    g1[0] = (-100.0 + x_rename) * RATIO; g1[1] = (0.0 + y_rename) * RATIO;
+    g2[0] = (-100.0 + x_rename) * RATIO; g2[1] = (-100.0 + y_rename) * RATIO;
+    g3[0] = (-100.0 + x_rename) * RATIO; g3[1] = (-200.0 + y_rename) * RATIO;
+    g4[0] = (-100.0 + x_rename) * RATIO; g4[1] = (-300.0 + y_rename) * RATIO;
 
 
     //print both matrices once only

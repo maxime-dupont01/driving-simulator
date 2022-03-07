@@ -7,6 +7,7 @@
 #define PRECISION 0.15
 
 /**** Menu *****/
+
 void renderMenu() {
     glClearColor(0.0, 0.0, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -434,7 +435,7 @@ void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::arr
                     std::array<double, 2> g1, std::array<double, 2> g2, std::array<double, 2> g3, std::array<double, 2> g4,
                     std::vector<std::pair<double, double>>& roads, std::vector<std::pair<double, double>>& middle_roads) {
 
-    int witdh = 5;
+    int witdh = 16;
     std::array<double, 2> f1, f2, f3, f4;
     f1[0] = p1[0]; f1[1] = p1[1];
     f2[0] = p2[0]; f2[1] = p2[1];
@@ -484,19 +485,16 @@ void drawPolygonsFromVectors(std::vector<std::pair<double,double>> v, double z, 
                 if (i == 4) {
                     drawLine(p1, p2, p3, z);
                     drawLine(p2, p3, p4, z);
-                    p1 = p2;
-                    p2 = p4;
+
                 } else {
-                    p4.first = it->first;
-                    p4.second = it->second;
-                    drawLine(p1, p2, p3, z);
-                    drawLine(p2, p3, p4, z);
-                    p1 = p2;
                     p2 = p4;
+                    p4.first = it->first; p4.second = it->second;
+                    drawLine(p1, p2, p4, z);
+                    drawLine(p1, p3, p4, z);
                 }
             } else {
-                p3.first = it->first;
-                p3.second = it->second;
+                p1 = p3;
+                p3.first = it->first; p3.second = it->second;
             }
         }
         i++;
