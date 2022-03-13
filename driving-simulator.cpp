@@ -27,7 +27,9 @@ int numberOfLaps = -1;
 Circuit circuit;
 
 // The different windows
-int winMenu, winGuide, winRun;
+int winMenu, winGuide, winRun, winTrackSelection;
+
+int trackSelected = 1;
 
 //point l, u, r;
 car_coord coord_car;
@@ -58,6 +60,12 @@ int main(int argc, char **argv){
     glutKeyboardFunc(keyboardGuide);
     glutHideWindow();
 
+    // Window and callback functions for Track Selection
+    winTrackSelection = glutCreateWindow("Track Selection");
+    glutDisplayFunc(renderTrackSelection);
+    glutReshapeFunc(stopReshape);
+    glutMouseFunc(mouseTrackSelection);
+    glutHideWindow();
 
     // Main application
     glutInitWindowSize(WINDOW_W_H_RUN, WINDOW_W_H_RUN);
@@ -115,7 +123,7 @@ void display() {
     auto diff_second = (unsigned long) difftime(temp, oldTime_fps);
     if(diff_second >= 1){
         oldTime_fps = temp;
-        printf("FPS=%i\n", fps);
+        //printf("FPS=%i\n", fps);
         fps = 0;
     }
 
@@ -139,7 +147,8 @@ void display() {
     //initialize the matrix
     glLoadIdentity();
 
-
+    gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+    /*
     // animation is case of collision -> shake the camera
     double delta = 0.3;
     switch (state) {
@@ -175,6 +184,7 @@ void display() {
             state = 0;
             break;
     }
+     */
 
     glMatrixMode(GL_MODELVIEW);
     speed *= 0.98;
@@ -227,7 +237,7 @@ void animate() {
 }
 
 void init() {
-    circuit.generate_circuit(3);
+    circuit.generate_circuit(trackSelected); //with track selected
     circuit.print();
 
     //clear the screen

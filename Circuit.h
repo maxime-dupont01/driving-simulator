@@ -1,7 +1,3 @@
-//
-// Created by rmarques on 01/03/2022.
-//
-
 #ifndef CIRCUIT_H
 #define CIRCUIT_H
 

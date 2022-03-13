@@ -1,7 +1,3 @@
-//
-// Created by rmarques on 01/03/2022.
-//
-
 #include "Circuit.h"
 #include "library.h"
 #define RATIO 1.7

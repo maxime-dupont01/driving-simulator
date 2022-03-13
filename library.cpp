@@ -24,7 +24,6 @@ void renderMenu() {
     printText(100,1400,"* Play");
     printText(100,1200,"* Guide");
     printText(100,1000,"* Quit");
-    printText(100,800,"* Credits");
 
     glutSwapBuffers();
 }
@@ -32,12 +31,12 @@ void renderMenu() {
 void mouseMenu(int button, int state, int x, int y) {
     if ((state == GLUT_DOWN) && (button == GLUT_LEFT_BUTTON)){
         if( (x > 110) && (x < 200) && (y > 305) && (y < 345) ) {
-            /*
             //Track Selection
             glutHideWindow();
             glutSetWindow(winTrackSelection);
             glutShowWindow();
-            */
+
+            /*
             //Play
             glutHideWindow();
             glutSetWindow(winRun);
@@ -48,6 +47,7 @@ void mouseMenu(int button, int state, int x, int y) {
             if(soundEngine) {
                 soundEngine->setSoundVolume(0.5f);
             }
+             */
 
         } else if( (x > 110) && (x < 240) && (y > 368) && (y < 403) ) {
             //Guide
@@ -59,15 +59,13 @@ void mouseMenu(int button, int state, int x, int y) {
             //Quit
             glutLeaveMainLoop();
 
-        } else if( (x > 110) && (x < 200) && (y > 490) && (y < 520) ) {
-            //Credits
         }
     }
     //printf("x=%i / y=%i\n", x, y);
 }
 
 /**** Track Selection *****/
-/*void renderTrackSelection() {
+void renderTrackSelection() {
     glClearColor(0.0, 0.0, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 1.0, 1.0);
@@ -75,38 +73,36 @@ void mouseMenu(int button, int state, int x, int y) {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0, 2500, 0, 2500);
+    gluOrtho2D(0, 3500, 0, 3500);
 
-    printText(1100,2300,"choose your track : ");
+    printText(1000,3250,"Choose your track : ");
 
     glLineWidth(1.0);
-    printText(100,1400,"* 1 - 0 shaped circuit");
-    printText(100,1200,"* 2 - run circuit");
-    printText(100,1000,"* 3 T shaped circuit");
+    printText(100,1800,"* 1 - 0 shaped circuit");
+    printText(100,1400,"* 2 - Run circuit");
+    printText(100,1000,"* 3 - Shaped circuit");
 
     glutSwapBuffers();
 }
 void mouseTrackSelection(int button, int state, int x, int y) {
     if ((state == GLUT_DOWN) && (button == GLUT_LEFT_BUTTON)) {
-        bool clicked_correctly = false;
-        if ((x > 110) && (x < 600) && (y > 305) && (y < 345)) {
+        int trackSelection = -1;
+
+        if ((x > 80) && (x < 370) && (y > 355) && (y < 375)) {
             //Track 1
             trackSelection = 1;
-            clicked_correctly = true;
 
-        } else if ((x > 110) && (x < 260) && (y > 368) && (y < 403)) {
-            ////Track 2
+        } else if ((x > 80) && (x < 450) && (y > 440) && (y < 460)) {
+            //Track 2
             trackSelection = 2;
-            clicked_correctly = true;
 
-
-        } else if ((x > 110) && (x < 600) && (y > 430) && (y < 460)) {
-            ////Track 3
+        } else if ((x > 80) && (x < 550) && (y > 530) && (y < 550)) {
+            //Track 3
             trackSelection = 3;
-            clicked_correctly = true;
-
         }
-        if (clicked_correctly) {
+
+        if (trackSelection != -1) {
+            trackSelected = trackSelection;
             glutHideWindow();
             glutSetWindow(winRun);
             glutShowWindow();
@@ -119,7 +115,8 @@ void mouseTrackSelection(int button, int state, int x, int y) {
         }
     }
 }
- */
+
+
 /**** Guide *****/
 void renderGuide() {
     glClearColor(0.0, 0.0, 0.3, 1.0);
