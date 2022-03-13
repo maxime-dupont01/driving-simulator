@@ -4,7 +4,7 @@
 #include <cstring>
 
 #include "library.h"
-#define PRECISION 0.15
+#define PRECISION 0.08
 
 /**** Menu *****/
 
@@ -137,25 +137,7 @@ float binomial_coff(float n,float k) {
 }
 
 
-///**********       Draw       **********////
-
-/*
-void drawAxes(drawaxes) {
-    if (drawaxes == 1) {
-        glColor3f(1.0, 1.0, 1.0);
-        glBegin(GL_LINES);{
-            glVertex3f( 100,0,0);
-            glVertex3f(-100,0,0);
-
-            glVertex3f(0,-100,0);
-            glVertex3f(0, 100,0);
-
-            glVertex3f(0,0, 100);
-            glVertex3f(0,0,-100);
-        }glEnd();
-    }
-}
-*/
+///**********       Draw       **********///
 
 void drawSquare(double a) {
     glColor3f(1.0,0.0,0.0);
@@ -239,61 +221,6 @@ void drawObstacle() {
         glVertex3f( 3,-105+nb,-10);
         glVertex3f(-3,-105+nb,-10);
         glVertex3f(-3, -100+nb,-10);
-    }glEnd();
-
-    glPopMatrix();
-}
-
-void drawTest() {
-    glPushMatrix();
-    glColor3f(0.184, 0.109, 0.13);
-
-    glTranslatef(0,0,3);
-
-    int nb1 = 1;
-    int nb2 = -60;
-
-    glBegin(GL_QUADS);{
-        glVertex3f( 17, nb2,-30);
-        glVertex3f( 17,nb2,-20);
-        glVertex3f(17,nb2+30,-20);
-        glVertex3f(17, nb2+30,-30);
-    }glEnd();
-
-    glPopMatrix();
-}
-
-void drawRoad() {
-    glPushMatrix();
-    glColor3f(0.245, 0.245, 0.245);
-
-    glBegin(GL_POLYGON);{
-        glVertex3f(100,0,-30);
-        glVertex3f(-100,0,-30);
-
-        glVertex3f(-100,-2500,-30);
-        glVertex3f(100,-2500,-30);
-    }glEnd();
-
-    glPopMatrix();
-
-    //drawBarrier();
-    //drawObstacle();
-    //drawTest();
-}
-
-void drawRoadMiddle() {
-    glPushMatrix();
-    glColor3f(1, 1, 1);
-
-    glTranslatef(0,0,3);
-
-    glBegin(GL_POLYGON);{
-        glVertex3f(-2,0,-30);
-        glVertex3f(2,0,-30);
-
-        glVertex3f(-2,-2500,-30);
-        glVertex3f(2,-2500,-30);
     }glEnd();
 
     glPopMatrix();
@@ -503,6 +430,8 @@ void drawPolygonsFromVectors(std::vector<std::pair<double,double>> v, double z, 
         std::cout << " p3 = " << p3.first << ", " << p3.second << "\n";
         std::cout << " p4 = " << p4.first << ", " << p4.second << "\n";*/
     }
+    drawLine(p1, p2, p3, z);
+    drawLine(p2, p3, p4, z);
     glColor3f(r,g,b);
 }
 

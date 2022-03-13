@@ -75,14 +75,9 @@ double deceleration(double speed_x);
 
 
 /* Draw */
-//void drawAxes();
-void drawSquare(double a);
 void drawCircle(double radius, int segments);
 void drawBarrier();
 void drawObstacle();
-void drawTest();
-void drawRoad();
-void drawRoadMiddle();
 void drawMainCar(double leftRightMove, double car);
 void drawBackground(double sky);
 void drawHill(double sky);
