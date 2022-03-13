@@ -2,7 +2,7 @@
 
 #include "Circuit.cpp"
 
-#define MAXSPEED 30.0
+#define MAXSPEED 110.0
 #define COEFF 1
 #define COEFF_TURN 1
 #define PI (2*acos(0.0))
@@ -57,6 +57,7 @@ int main(int argc, char **argv){
     glutReshapeFunc(stopReshape);
     glutKeyboardFunc(keyboardGuide);
     glutHideWindow();
+
 
     // Main application
     glutInitWindowSize(WINDOW_W_H_RUN, WINDOW_W_H_RUN);
@@ -205,7 +206,7 @@ void animate() {
       ******************/
 
     if(keys.IS_KEY_UP) {
-        speed = acceleration(speed);
+        acceleration(speed);
     }
     if(keys.IS_KEY_DOWN) {
         speed = deceleration(speed);
@@ -226,7 +227,7 @@ void animate() {
 }
 
 void init() {
-    circuit.generate_circuit(1);
+    circuit.generate_circuit(3);
     circuit.print();
 
     //clear the screen
@@ -246,26 +247,22 @@ void init() {
     gluPerspective(80, 1,	1, 30000.0);
 }
 
-double acceleration (double speed_x) {
-    double ret;
+void acceleration (double &speed_x) {
     if (speed_x == MAXSPEED)
-        return speed_x;
-
-    if (speed_x < 3) {
-        ret = speed_x + 0.5*COEFF;
-    } else if (speed_x < 8) {
-        ret = speed_x + 0.3*COEFF;
-    } else if (speed_x < 13) {
-        ret = speed_x + 0.2*COEFF;
-    } else if (speed_x < 16) {
-        ret = speed_x + 0.1*COEFF;
+        return;
+    if (speed_x < MAXSPEED/(MAXSPEED/6.6666)) {
+        speed_x += 0.5*COEFF;
+    } else if (speed_x < (MAXSPEED/3.3333)) {
+        speed_x += 0.3*COEFF;
+    } else if (speed_x < (MAXSPEED/1.428)) {
+        speed_x += 0.2*COEFF;
+    } else if (speed_x < (MAXSPEED/1.2)) {
+        speed_x += 0.1*COEFF;
     } else {
-        ret = speed_x + 0.07*COEFF;
+        speed_x + 0.07*COEFF;
         if (speed_x > MAXSPEED)
-            ret = MAXSPEED;
+            speed_x = MAXSPEED;
     }
-
-    return ret;
 }
 
 double deceleration(double speed_x) {

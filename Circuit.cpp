@@ -177,21 +177,101 @@ void Circuit::circuit2() {
 
     //seventh portion of the road
     p1[0] = (800.0 + x_rename) * RATIO; p1[1] = (1700.0 + y_rename) * RATIO;
-    p2[0] = (100.0 + x_rename) * RATIO; p2[1] = (1100.0 + y_rename) * RATIO;
-    p3[0] = (100.0 + x_rename) * RATIO; p3[1] = (0.0 + y_rename) * RATIO;
-    p4[0] = (100.0 + x_rename) * RATIO; p4[1] = (0.0 + y_rename) * RATIO;
+    p2[0] = (700.0 + x_rename) * RATIO; p2[1] = (2200.0 + y_rename) * RATIO;
+    p3[0] = (150.0 + x_rename) * RATIO; p3[1] = (1700.0 + y_rename) * RATIO;
+    p4[0] = (85.0 + x_rename) * RATIO; p4[1] = (-230.0 + y_rename) * RATIO;
 
     g1[0] = (1000.0 + x_rename) * RATIO; g1[1] = (1700.0 + y_rename) * RATIO;
-    g2[0] = (-100.0 + x_rename) * RATIO; g2[1] = (1100.0 + y_rename) * RATIO;
-    g3[0] = (-100.0 + x_rename) * RATIO; g3[1] = (0.0 + y_rename) * RATIO;
-    g4[0] = (-100.0 + x_rename) * RATIO; g4[1] = (0.0 + y_rename) * RATIO;
+    g2[0] = (850.0 + x_rename) * RATIO; g2[1] = (2500.0 + y_rename) * RATIO;
+    g3[0] = (0.0 + x_rename) * RATIO; g3[1] = (1900.0 + y_rename) * RATIO;
+    g4[0] = (-115.0 + x_rename) * RATIO; g4[1] = (-256.0 + y_rename) * RATIO;
 
     drawRoadBezier(p1, p2, p3, p4, g1, g2, g3, g4, Circuit::roads, Circuit::middle_roads);
 
 }
 
 void Circuit::circuit3() {
+    std::array<double, 2> p1, p2, p3, p4, g1, g2, g3, g4;
+    int x_rename = 0;
+    int y_rename = 0;
 
+    //first portion of the road
+    p1[0] = (100.0 + x_rename) * RATIO; p1[1] = (0.0 + y_rename) * RATIO;
+    p2[0] = (100.0 + x_rename) * RATIO; p2[1] = (-900.0 + y_rename) * RATIO;
+    p3[0] = (100.0 + x_rename) * RATIO; p3[1] = (-900.0 + y_rename) * RATIO;
+    p4[0] = (-700.0 + x_rename) * RATIO; p4[1] = (-900.0 + y_rename) * RATIO;
+
+    g1[0] = (-100.0 + x_rename) * RATIO; g1[1] = (0.0 + y_rename) * RATIO;
+    g2[0] = (-80.0 + x_rename) * RATIO; g2[1] = (-750.0 + y_rename) * RATIO;
+    g3[0] = (-80.0 + x_rename) * RATIO; g3[1] = (-750.0 + y_rename) * RATIO;
+    g4[0] = (-700.0 + x_rename) * RATIO; g4[1] = (-700.0 + y_rename) * RATIO;
+
+    drawRoadBezier(p1, p2, p3, p4, g1, g2, g3, g4, Circuit::roads, Circuit::middle_roads);
+
+    //second portion of the road
+    p1[0] = (-700.0 + x_rename) * RATIO; p1[1] = (-900.0 + y_rename) * RATIO;
+    p2[0] = (-1400.0 + x_rename) * RATIO; p2[1] = (-900.0 + y_rename) * RATIO;
+    p3[0] = (-1400.0 + x_rename) * RATIO; p3[1] = (-1600.0 + y_rename) * RATIO;
+    p4[0] = (-700.0 + x_rename) * RATIO; p4[1] = (-1600.0 + y_rename) * RATIO;
+
+    g1[0] = (-700.0 + x_rename) * RATIO; g1[1] = (-700.0 + y_rename) * RATIO;
+    g2[0] = (-1500.0 + x_rename) * RATIO; g2[1] = (-700.0 + y_rename) * RATIO;
+    g3[0] = (-1500.0 + x_rename) * RATIO; g3[1] = (-1800.0 + y_rename) * RATIO;
+    g4[0] = (-700.0 + x_rename) * RATIO; g4[1] = (-1800.0 + y_rename) * RATIO;
+
+    drawRoadBezier(p1, p2, p3, p4, g1, g2, g3, g4, Circuit::roads, Circuit::middle_roads);
+
+    //third portion of the road
+    p1[0] = (-700.0 + x_rename) * RATIO; p1[1] = (-1600.0 + y_rename) * RATIO;
+    p2[0] = (75.0 + x_rename) * RATIO; p2[1] = (-2300.0 + y_rename) * RATIO;
+    p3[0] = (1625.0 + x_rename) * RATIO; p3[1] = (-700.0 + y_rename) * RATIO;
+    p4[0] = (2400.0 + x_rename) * RATIO; p4[1] = (-1600.0 + y_rename) * RATIO;
+
+    g1[0] = (-700.0 + x_rename) * RATIO; g1[1] = (-1800.0 + y_rename) * RATIO;
+    g2[0] = (75.0 + x_rename) * RATIO; g2[1] = (-2500.0 + y_rename) * RATIO;
+    g3[0] = (1625.0 + x_rename) * RATIO; g3[1] = (-900.0 + y_rename) * RATIO;
+    g4[0] = (2400.0 + x_rename) * RATIO; g4[1] = (-1800.0 + y_rename) * RATIO;
+
+    drawRoadBezier(p1, p2, p3, p4, g1, g2, g3, g4, Circuit::roads, Circuit::middle_roads);
+
+    //fourth portion of the road
+    p1[0] = (2400.0 + x_rename) * RATIO; p1[1] = (-1600.0 + y_rename) * RATIO;
+    p2[0] = (3500.0 + x_rename) * RATIO; p2[1] = (-1700.0 + y_rename) * RATIO;
+    p3[0] = (3500.0 + x_rename) * RATIO; p3[1] = (-900.0 + y_rename) * RATIO;
+    p4[0] = (2000.0 + x_rename) * RATIO; p4[1] = (-1300.0 + y_rename) * RATIO;
+
+    g1[0] = (2400.0 + x_rename) * RATIO; g1[1] = (-1800.0 + y_rename) * RATIO;
+    g2[0] = (3700.0 + x_rename) * RATIO; g2[1] = (-1900.0 + y_rename) * RATIO;
+    g3[0] = (3700.0 + x_rename) * RATIO; g3[1] = (-700.0 + y_rename) * RATIO;
+    g4[0] = (2000.0 + x_rename) * RATIO; g4[1] = (-1100.0 + y_rename) * RATIO;
+
+    drawRoadBezier(p1, p2, p3, p4, g1, g2, g3, g4, Circuit::roads, Circuit::middle_roads);
+
+    //fifth portion of the road
+    p1[0] = (2000.0 + x_rename) * RATIO; p1[1] = (-1300.0 + y_rename) * RATIO;
+    p2[0] = (1300.0 + x_rename) * RATIO; p2[1] = (-1000.0 + y_rename) * RATIO;
+    p3[0] = (500.0 + x_rename) * RATIO; p3[1] = (-200.0 + y_rename) * RATIO;
+    p4[0] = (500.0 + x_rename) * RATIO; p4[1] = (500.0 + y_rename) * RATIO;
+
+    g1[0] = (2000.0 + x_rename) * RATIO; g1[1] = (-1100.0 + y_rename) * RATIO;
+    g2[0] = (1400.0 + x_rename) * RATIO; g2[1] = (-850.0 + y_rename) * RATIO;
+    g3[0] = (700.0 + x_rename) * RATIO; g3[1] = (-100.0 + y_rename) * RATIO;
+    g4[0] = (700.0 + x_rename) * RATIO; g4[1] = (500.0 + y_rename) * RATIO;
+
+    drawRoadBezier(p1, p2, p3, p4, g1, g2, g3, g4, Circuit::roads, Circuit::middle_roads);
+
+    //sixth portion of the road
+    p1[0] = (500.0 + x_rename) * RATIO; p1[1] = (500.0 + y_rename) * RATIO;
+    p2[0] = (500.0 + x_rename) * RATIO; p2[1] = (1200.0 + y_rename) * RATIO;
+    p3[0] = (100.0 + x_rename) * RATIO; p3[1] = (1200.0 + y_rename) * RATIO;
+    p4[0] = (88.0 + x_rename) * RATIO; p4[1] = (-230.0 + y_rename) * RATIO;
+
+    g1[0] = (700.0 + x_rename) * RATIO; g1[1] = (500.0 + y_rename) * RATIO;
+    g2[0] = (700.0 + x_rename) * RATIO; g2[1] = (1400.0 + y_rename) * RATIO;
+    g3[0] = (-100.0 + x_rename) * RATIO; g3[1] = (1400.0 + y_rename) * RATIO;
+    g4[0] = (-108.0 + x_rename) * RATIO; g4[1] = (-256.0 + y_rename) * RATIO;
+
+    drawRoadBezier(p1, p2, p3, p4, g1, g2, g3, g4, Circuit::roads, Circuit::middle_roads);
 }
 
 std::pair<double, double> Circuit::rotate(double x, double y, float teta) {

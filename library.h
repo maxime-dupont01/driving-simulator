@@ -22,7 +22,7 @@ using namespace irrklang;
 #pragma comment(lib, "irrKlang.lib") // link with irrKlang.dll
 
 // The different windows
-extern int winMenu, winGuide, winRun;
+extern int winMenu, winGuide, winRun  /*, winTrackSelection, trackSelection*/;
 
 extern ISoundEngine* soundEngine; //for sound
 extern ISoundEngine* soundEngine_effets; //for sound for effets
@@ -49,6 +49,12 @@ struct keys_use {
 void renderMenu();
 void mouseMenu(int button, int state, int x, int y);
 
+/*Track */
+/*
+void renderTrackSelection();
+void mouseTrackSelection(int button, int state, int x, int y);
+*/
+
 /* Guide */
 void renderGuide();
 void keyboardGuide(unsigned char Key, int x, int y);
@@ -70,8 +76,8 @@ void keyboardListener(unsigned char Key, int x, int y);
 void specialUpListener(int key, int x, int y);
 
 
-double acceleration (double speed_x);
-double deceleration(double speed_x);
+void acceleration (double &speed_x);
+double deceleration (double speed_x);
 
 
 /* Draw */

@@ -28,9 +28,16 @@ void renderMenu() {
 
     glutSwapBuffers();
 }
+
 void mouseMenu(int button, int state, int x, int y) {
     if ((state == GLUT_DOWN) && (button == GLUT_LEFT_BUTTON)){
         if( (x > 110) && (x < 200) && (y > 305) && (y < 345) ) {
+            /*
+            //Track Selection
+            glutHideWindow();
+            glutSetWindow(winTrackSelection);
+            glutShowWindow();
+            */
             //Play
             glutHideWindow();
             glutSetWindow(winRun);
@@ -59,7 +66,60 @@ void mouseMenu(int button, int state, int x, int y) {
     //printf("x=%i / y=%i\n", x, y);
 }
 
+/**** Track Selection *****/
+/*void renderTrackSelection() {
+    glClearColor(0.0, 0.0, 0.3, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0, 1.0, 1.0);
+    glLineWidth(3.0); // Width for stroke text (1 by default)
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, 2500, 0, 2500);
+
+    printText(1100,2300,"choose your track : ");
+
+    glLineWidth(1.0);
+    printText(100,1400,"* 1 - 0 shaped circuit");
+    printText(100,1200,"* 2 - run circuit");
+    printText(100,1000,"* 3 T shaped circuit");
+
+    glutSwapBuffers();
+}
+void mouseTrackSelection(int button, int state, int x, int y) {
+    if ((state == GLUT_DOWN) && (button == GLUT_LEFT_BUTTON)) {
+        bool clicked_correctly = false;
+        if ((x > 110) && (x < 600) && (y > 305) && (y < 345)) {
+            //Track 1
+            trackSelection = 1;
+            clicked_correctly = true;
+
+        } else if ((x > 110) && (x < 260) && (y > 368) && (y < 403)) {
+            ////Track 2
+            trackSelection = 2;
+            clicked_correctly = true;
+
+
+        } else if ((x > 110) && (x < 600) && (y > 430) && (y < 460)) {
+            ////Track 3
+            trackSelection = 3;
+            clicked_correctly = true;
+
+        }
+        if (clicked_correctly) {
+            glutHideWindow();
+            glutSetWindow(winRun);
+            glutShowWindow();
+
+            // play main sound
+            soundEngine->play2D("./irrKlang/media/getout.ogg", true, false, true);
+            if (soundEngine) {
+                soundEngine->setSoundVolume(0.5f);
+            }
+        }
+    }
+}
+ */
 /**** Guide *****/
 void renderGuide() {
     glClearColor(0.0, 0.0, 0.3, 1.0);
@@ -83,7 +143,6 @@ void renderGuide() {
     printText(100,1200,"- Right arrow : to turn right");
 
     printText(300,300,"[ Press Enter to go back to the Menu ]");
-
 
     glutSwapBuffers();
 }
