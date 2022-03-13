@@ -29,7 +29,7 @@ Circuit circuit;
 // The different windows
 int winMenu, winGuide, winRun, winTrackSelection;
 
-int trackSelected = 1;
+int trackSelected;
 
 //point l, u, r;
 car_coord coord_car;
@@ -108,8 +108,13 @@ int main(int argc, char **argv){
 
     return 0;
 }
-
+bool first_display = true;
 void display() {
+    if (first_display) {
+        circuit.generate_circuit(trackSelected); //with track selected
+        circuit.print();
+        first_display = false;
+    }
     // get FPS :
     if (numberOfLaps >= 1) { //1 tour de circuit
         if (time_recorded == 0) {
@@ -237,8 +242,6 @@ void animate() {
 }
 
 void init() {
-    circuit.generate_circuit(trackSelected); //with track selected
-    circuit.print();
 
     //clear the screen
     glClearColor(0, 0, 0, 0);
