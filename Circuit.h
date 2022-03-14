@@ -9,6 +9,7 @@ class Circuit {
         void print();
         static std::pair<double, double> rotate(double x,double y,float teta);
         bool isLapPassed();
+        bool isOnTheRoad();
         void rotateCircuit(float teta);
         std::vector<std::pair<double,double>> roads;
         std::vector<std::pair<double,double>> middle_roads;

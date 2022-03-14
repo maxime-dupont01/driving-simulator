@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <irrKlang.h> // for sound
 #include "./irrKlang/conio.h" //same
+#include "Timer.h"
+
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
@@ -104,7 +106,7 @@ void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::arr
 
 
 /* Odometer */
-void HUD(double speed);
-void drawHUD(double speed);
+void HUD(double speed, int laps, int num_total_laps, Timer *pInt);
+void drawHUD(double speed, int i, int i1, Timer pInt[3]);
 
 #endif

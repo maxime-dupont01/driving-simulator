@@ -1,14 +1,13 @@
 #include "library.h"
-
+#include "Timer.cpp"
 #include "Circuit.cpp"
 
-#define MAXSPEED 110.0
+#define MAXSPEED 200.0
 #define COEFF 1
 #define COEFF_TURN 1
 #define PI (2*acos(0.0))
 
-double car = 0;
-double X = 10, Y = 50, Z = 10;
+
 float lx=0.0f,lz=-1.0f; // actual vector representing the camera's direction
 double leftRightMove = 0;
 double sky = -1000;
@@ -16,13 +15,19 @@ double speed = 0.0;
 time_t oldTime_fps;
 time_t oldTime_enough;
 time_t starting_time = time(nullptr);
+Timer starting_timer;
+Timer lapTimes[3];
+
+Timer reduceNoiseCollision;
 unsigned long time_recorded = 0;
 int fps = 0;
 unsigned int state = 0; // different than 0 for shake camera
 
 float turn = .01;
 bool enoughTime = true;
-int numberOfLaps = -1;
+int numberOfLaps = 0;
+int maxLaps = 3;
+bool outOfTheRoad = false;
 
 Circuit circuit;
 
@@ -114,15 +119,14 @@ void display() {
         circuit.generate_circuit(trackSelected); //with track selected
         circuit.print();
         first_display = false;
+        starting_timer.start();
     }
-    // get FPS :
-    if (numberOfLaps >= 1) { //1 tour de circuit
-        if (time_recorded == 0) {
-            time_recorded = (unsigned long) difftime(time(nullptr), starting_time);
-        }
-        std::cout << "FINISHED ! in " << time_recorded << " seconds, not bad !\n";
+
+    if (numberOfLaps > maxLaps) { // 3 tour de circuit
         return;
     }
+
+    // get FPS :
     ++fps;
     time_t temp = time(nullptr);
     auto diff_second = (unsigned long) difftime(temp, oldTime_fps);
@@ -132,12 +136,31 @@ void display() {
         fps = 0;
     }
 
+    //cooldown timer for finished lap's detection
     diff_second = (unsigned long) difftime(temp, oldTime_enough);
     if (diff_second >= 15) {
         oldTime_enough = temp;
         enoughTime = true;
     }
-        //clear the display
+
+
+
+    if (circuit.isOnTheRoad()) {
+        if (!reduceNoiseCollision.isRunning())
+            reduceNoiseCollision.start();
+        outOfTheRoad = false;
+        std::cout << "on the road" << std::endl;
+    } else {
+        if (reduceNoiseCollision.elapsedMilliseconds() > 500 && reduceNoiseCollision.isRunning()) {
+            std::cout << "OUT OF THE ROAD " << std::endl;
+            outOfTheRoad = true;
+            reduceNoiseCollision.stop();
+        } else {
+            reduceNoiseCollision.start();
+        }
+    }
+
+    //clear the display
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(.7, 0.7, 1,0.7);	//color white/blue
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -152,7 +175,7 @@ void display() {
     //initialize the matrix
     glLoadIdentity();
 
-    gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
+    gluLookAt(0,50, 10,	0+lx,-99999999999, 0+lz,	0,0,1);
     /*
     // animation is case of collision -> shake the camera
     double delta = 0.3;
@@ -193,23 +216,34 @@ void display() {
 
     glMatrixMode(GL_MODELVIEW);
     speed *= 0.98;
-    if (enoughTime){
+
+    if (enoughTime) {
         if (circuit.isLapPassed()) {
+
             numberOfLaps++;
             std::cout << "number of lap(s) : " << numberOfLaps << "\n";
             enoughTime = false;
+
+            if (numberOfLaps <= maxLaps+1 && numberOfLaps != 1) {
+                starting_timer.stop();
+                lapTimes[numberOfLaps-2] = starting_timer;
+                std::cout << lapTimes[numberOfLaps-2].elapsedMilliseconds() << "\n";
+                starting_timer.start();
+                starting_time = time(nullptr);
+            }
         }
     }
+
     circuit.shiftCircuit(speed);
     drawPolygonsFromVectors(circuit.roads, -30.0, 0.245, 0.245, 0.245);
     drawPolygonsFromVectors(circuit.middle_roads, -29.80, 1, 1, 1);
 
-    drawMainCar(leftRightMove, car);
+    drawMainCar(leftRightMove, 0);
     /*
     drawBackground(sky);
     drawHill(sky);
     */
-    drawHUD(speed);
+    drawHUD(speed, numberOfLaps, maxLaps, lapTimes);
     glutSwapBuffers();
 
 }
@@ -263,6 +297,9 @@ void init() {
 void acceleration (double &speed_x) {
     if (speed_x == MAXSPEED)
         return;
+    if (speed_x < MAXSPEED/(MAXSPEED/7.4)) {
+        speed_x += 0.05 * COEFF;
+    }
     if (speed_x < MAXSPEED/(MAXSPEED/6.6666)) {
         speed_x += 0.5*COEFF;
     } else if (speed_x < (MAXSPEED/3.3333)) {

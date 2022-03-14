@@ -4,7 +4,7 @@
 #include <cstring>
 
 #include "library.h"
-#define PRECISION 0.08
+#define PRECISION 0.05
 
 /**** Menu *****/
 
@@ -491,7 +491,7 @@ void drawPolygonsFromVectors(std::vector<std::pair<double,double>> v, double z, 
     glColor3f(r,g,b);
 }
 
-void HUD(double speed) {
+void HUD(double speed, int laps, int num_total_laps, Timer pInt[3]) {
     glTranslatef(-450, -450, 0);
 
     glColor3f(0.663, 0.663, 0.663); 
@@ -544,9 +544,47 @@ void HUD(double speed) {
     for(int i = 0; speed_value[i] != '\0'; i++) {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, speed_value[i]);
     }
+
+    char number_laps[32];
+    if (laps != 4) {
+        sprintf(number_laps, "laps : %d / %d", laps, num_total_laps);
+    } else {
+        sprintf(number_laps, "laps : %d / %d", laps-1, num_total_laps);
+    }
+    glColor3f(0, 0, 0);
+    glRasterPos3f(800, 900 ,0);
+    for(int i = 0; number_laps[i] != '\0'; i++) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, number_laps[i]);
+    }
+
+    //print the lap times
+    for (int i = 1 ; i <= 4; ++i) {
+        if (pInt[i-1].elapsedSeconds() > 1 || i == 4) {
+            char lapTime[32];
+            if (i == 4) {
+                if (pInt[2].elapsedSeconds() >= 10) {
+                    auto total_time = pInt[0].elapsedSeconds() + pInt[1].elapsedSeconds() + pInt[2].elapsedSeconds();
+                    sprintf(lapTime, "total lap time : %.2f seconds", total_time);
+                    glColor3f(0, 0, 0);
+                    glRasterPos3f(600, 900 - (30 * i), 0);
+                    for (int j = 0; lapTime[j] != '\0'; j++) {
+                        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, lapTime[j]);
+                    }
+                }
+            } else {
+                sprintf(lapTime, "lap %d : %f seconds", i, pInt[i - 1].elapsedSeconds());
+                glColor3f(0, 0, 0);
+                glRasterPos3f(600, 900 - (30 * i), 0);
+                for (int j = 0; lapTime[j] != '\0'; j++) {
+                    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, lapTime[j]);
+                }
+            }
+
+        }
+    }
 }
 
-void drawHUD(double speed) {
+void drawHUD(double speed, int i, int i1, Timer pInt[3]) {
     // setup viewing projection
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -558,7 +596,7 @@ void drawHUD(double speed) {
     glPushMatrix();
     glLoadIdentity();
 
-    HUD(speed);
+    HUD(speed, i, i1, pInt);
 
     //set 3D matrix mode back
     glMatrixMode(GL_PROJECTION);

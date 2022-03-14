@@ -31,6 +31,14 @@ bool Circuit::isLapPassed() {
             && (first_x < 500);
 }
 
+bool Circuit::isOnTheRoad(){
+    int precision = 80;
+    for (auto & middle_road : middle_roads) {
+        if ((abs(middle_road.first) + abs(middle_road.second)) / 2 < 75 + precision)
+            return true;
+    }
+    return false;
+}
 void Circuit::circuit1() {
     std::array<double, 2> p1, p2, p3, p4, g1, g2, g3, g4;
     int x_rename = 0;
