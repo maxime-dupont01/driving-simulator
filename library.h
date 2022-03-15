@@ -1,15 +1,16 @@
 #ifndef _LIBRARY_H
 #define _LIBRARY_H
 
-#include <stdlib.h>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
 #include <iostream>
 #include <cstring>
+#include <GL/glew.h>
 #include <GL/freeglut.h>
-#include <time.h>
+#include <ctime>
 #include <array>
 #include <vector>
-#include <stdio.h>
+#include <cstdio>
 #include <irrKlang.h> // for sound
 #include "./irrKlang/conio.h" //same
 #include "Timer.h"
@@ -83,30 +84,19 @@ double deceleration (double speed_x);
 
 
 /* Draw */
-void drawCircle(double radius, int segments);
-void drawBarrier();
-void drawObstacle();
 void drawMainCar(double leftRightMove, double car);
-void drawBackground(double sky);
-void drawHill(double sky);
-
 void drawLine(std::pair<double,double> p1, std::pair<double, double> p2, std::pair<double, double> p3, double z);
-
 void drawPolygonsFromVectors(std::vector<std::pair<double,double>> v, double z, double r, double g, double b);
-
 std::pair<double, double> drawBezierGeneralized(std::array<std::array<double, 2>,4> PT, double t);
-
 void drawBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4,
                 std::array<double, 2> p5, std::array<double, 2> p6, std::array<double, 2> p7, std::array<double, 2> p8,
                 double z, double r, double g, double b, std::vector<std::pair<double, double>>& ret);
-
 void drawRoadBezier(std::array<double, 2> p1, std::array<double, 2> p2, std::array<double, 2> p3, std::array<double, 2> p4,
                     std::array<double, 2> p5, std::array<double, 2> p6, std::array<double, 2> p7, std::array<double, 2> p8,
                     std::vector<std::pair<double, double>>& roads, std::vector<std::pair<double, double>>& middle_roads);
 
-
 /* Odometer */
-void HUD(double speed, int laps, int num_total_laps, Timer *pInt);
-void drawHUD(double speed, int i, int i1, Timer pInt[3]);
+void HUD(double speed, int laps, int num_total_laps, Timer *pInt,const int penalities[4], bool outOfTheRoad);
+void drawHUD(double speed, int i, int i1, Timer pInt[3],int penalities[4], bool outOfTheRoad);
 
 #endif

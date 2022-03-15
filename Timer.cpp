@@ -34,6 +34,7 @@
     {
         return elapsedMilliseconds() / 1000.0;
     }
+
     bool Timer::isRunning() {
     return m_bRunning;
-};
+}

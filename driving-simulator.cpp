@@ -2,32 +2,32 @@
 #include "Timer.cpp"
 #include "Circuit.cpp"
 
-#define MAXSPEED 200.0
-#define COEFF 1
+#define MAXSPEED 40.0
+#define COEFF 0.03
 #define COEFF_TURN 1
 #define PI (2*acos(0.0))
 
 
 float lx=0.0f,lz=-1.0f; // actual vector representing the camera's direction
 double leftRightMove = 0;
-double sky = -1000;
 double speed = 0.0;
 time_t oldTime_fps;
-time_t oldTime_enough;
-time_t starting_time = time(nullptr);
 Timer starting_timer;
 Timer lapTimes[3];
+int penalities[4];
 
 Timer reduceNoiseCollision;
 unsigned long time_recorded = 0;
 int fps = 0;
 unsigned int state = 0; // different than 0 for shake camera
 
-float turn = .01;
+float teta = .01;
 bool enoughTime = true;
 int numberOfLaps = 0;
 int maxLaps = 3;
 bool outOfTheRoad = false;
+bool turn_left = false;
+bool turn_right = false;
 
 Circuit circuit;
 
@@ -114,55 +114,65 @@ int main(int argc, char **argv){
     return 0;
 }
 bool first_display = true;
+
+void turn();
+bool finished = false;
 void display() {
-    if (first_display) {
-        circuit.generate_circuit(trackSelected); //with track selected
-        circuit.print();
-        first_display = false;
-        starting_timer.start();
-    }
+//    std::cout << speed << std::endl;
+    if (!finished){
+        if (first_display) {
+            circuit.generate_circuit(trackSelected); //with track selected
+            circuit.print();
+            first_display = false;
+            starting_timer.start();
+        }
 
-    if (numberOfLaps > maxLaps) { // 3 tour de circuit
-        return;
-    }
+        if (numberOfLaps > maxLaps) { // 3 tour de circuit
+            finished = true;
+            return;
+        }
 
-    // get FPS :
-    ++fps;
-    time_t temp = time(nullptr);
-    auto diff_second = (unsigned long) difftime(temp, oldTime_fps);
-    if(diff_second >= 1){
-        oldTime_fps = temp;
-        //printf("FPS=%i\n", fps);
-        fps = 0;
-    }
+        // get FPS :
+        ++fps;
+        time_t temp = time(nullptr);
+        auto diff_second = (unsigned long) difftime(temp, oldTime_fps);
+        if (diff_second >= 1) {
+            oldTime_fps = temp;
+            //printf("FPS=%i\n", fps);
+            fps = 0;
+        }
 
-    //cooldown timer for finished lap's detection
-    diff_second = (unsigned long) difftime(temp, oldTime_enough);
-    if (diff_second >= 15) {
-        oldTime_enough = temp;
-        enoughTime = true;
-    }
+        //cooldown timer for finished lap's detection
+        if (starting_timer.elapsedSeconds() >= 8) {
+            enoughTime = true;
+        }
 
-
-
-    if (circuit.isOnTheRoad()) {
-        if (!reduceNoiseCollision.isRunning())
-            reduceNoiseCollision.start();
-        outOfTheRoad = false;
-        std::cout << "on the road" << std::endl;
-    } else {
-        if (reduceNoiseCollision.elapsedMilliseconds() > 500 && reduceNoiseCollision.isRunning()) {
-            std::cout << "OUT OF THE ROAD " << std::endl;
-            outOfTheRoad = true;
-            reduceNoiseCollision.stop();
+        if (circuit.isOnTheRoad()) {
+            if (!reduceNoiseCollision.isRunning())
+                reduceNoiseCollision.start();
+            outOfTheRoad = false;
         } else {
-            reduceNoiseCollision.start();
+            if (reduceNoiseCollision.elapsedMilliseconds() > 500 && reduceNoiseCollision.isRunning()) {
+                outOfTheRoad = true;
+                if (penalities[numberOfLaps] >= 0) {
+                    penalities[numberOfLaps] += 10;
+                } else {
+                    penalities[numberOfLaps] = 10;
+                }
+                reduceNoiseCollision.stop();
+
+            } else {
+                reduceNoiseCollision.start();
+            }
         }
     }
-
     //clear the display
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(.7, 0.7, 1,0.7);	//color white/blue
+    if (outOfTheRoad) {
+        glClearColor(1, 0.7, 0.7,0.7);	//color white/red
+    } else {
+        glClearColor(.7, 0.7, 1,0.7);	//color white/blue
+    }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /********************
@@ -175,62 +185,32 @@ void display() {
     //initialize the matrix
     glLoadIdentity();
 
-    gluLookAt(0,50, 10,	0+lx,-99999999999, 0+lz,	0,0,1);
-    /*
-    // animation is case of collision -> shake the camera
-    double delta = 0.3;
-    switch (state) {
-        case 0:
-            gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
-            break;
-        case 1:
-            gluLookAt(delta,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
-            state = 2;
-            break;
-        case 2:
-            gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
-            state = 3;
-            break;
-        case 3:
-            gluLookAt(-delta,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
-            state = 4;
-            break;
-        case 4:
-            gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
-            state = 5;
-            break;
-        case 5:
-            gluLookAt(delta,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
-            state = 6;
-            break;
-        case 6:
-            gluLookAt(0,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
-            state = 7;
-            break;
-        case 7:
-            gluLookAt(-delta,Y,10,	0+lx,-99999999999, 0+lz,	0,0,1);
-            state = 0;
-            break;
-    }
-     */
+    gluLookAt(0,50, 10,	0+lx,-990, 0+lz,	0,0,1);
 
     glMatrixMode(GL_MODELVIEW);
-    speed *= 0.98;
+    teta *= 0.8;
+    speed *= 0.995;
+
+    if (teta > 0.001) {
+        if (turn_right) {
+            circuit.rotateCircuit(-teta);
+            circuit.rotateCircuit(teta);
+        } else if (turn_left) {
+            circuit.rotateCircuit(teta);
+            circuit.rotateCircuit(-teta);
+        }
+    }
 
     if (enoughTime) {
         if (circuit.isLapPassed()) {
-
             numberOfLaps++;
-            std::cout << "number of lap(s) : " << numberOfLaps << "\n";
             enoughTime = false;
 
             if (numberOfLaps <= maxLaps+1 && numberOfLaps != 1) {
                 starting_timer.stop();
                 lapTimes[numberOfLaps-2] = starting_timer;
-                std::cout << lapTimes[numberOfLaps-2].elapsedMilliseconds() << "\n";
-                starting_timer.start();
-                starting_time = time(nullptr);
             }
+            starting_timer.start();
         }
     }
 
@@ -243,7 +223,7 @@ void display() {
     drawBackground(sky);
     drawHill(sky);
     */
-    drawHUD(speed, numberOfLaps, maxLaps, lapTimes);
+    drawHUD(speed, numberOfLaps, maxLaps, lapTimes, penalities, outOfTheRoad);
     glutSwapBuffers();
 
 }
@@ -254,25 +234,78 @@ void animate() {
          key listeners
       ******************/
 
-    if(keys.IS_KEY_UP) {
-        acceleration(speed);
-    }
-    if(keys.IS_KEY_DOWN) {
-        speed = deceleration(speed);
-    }
-    if(keys.IS_KEY_LEFT) {
-        circuit.rotateCircuit(turn);
-        circuit.rotateCircuit(-turn);
-    }
+    if (!finished){
+        if (keys.IS_KEY_UP) {
+            acceleration(speed);
+        }
+        if (keys.IS_KEY_DOWN) {
+            speed = deceleration(speed);
+        }
+        if (keys.IS_KEY_LEFT) {
+            turn();
+            turn_right = false;
+            turn_left = true;
+            circuit.rotateCircuit(teta);
+            circuit.rotateCircuit(-teta);
+        }
 
-    if(keys.IS_KEY_RIGHT) {
-        circuit.rotateCircuit(-turn);
-        circuit.rotateCircuit(turn);
-    }
-
-    double ratio = 20/sqrt(2);
+        if (keys.IS_KEY_RIGHT) {
+            turn();
+            turn_right = true;
+            turn_left = false;
+            circuit.rotateCircuit(-teta);
+            circuit.rotateCircuit(teta);
+        }
+    }    double ratio = 20/sqrt(2);
 
     glutPostRedisplay();
+}
+
+void turn() {
+    if (speed < 1) {
+        teta = 0;
+        return;
+    }
+    if (speed < MAXSPEED/28) {
+        teta = 0.006;
+        return;
+    }
+    if (speed < (MAXSPEED/14)*2) {
+        teta = 0.006;
+        return;
+    }
+    if (speed < (MAXSPEED/14)*3) {
+        teta = 0.006;
+        return;
+    }
+    if (speed < (MAXSPEED/14)*4) {
+        teta = 0.006;
+        return;
+    }
+    if (speed < (MAXSPEED/14)*5) {
+        teta = 0.005;
+        return;
+    }
+    if (speed < (MAXSPEED/7)*3) {
+        teta = 0.004;
+        return;
+    }
+    if (speed < (MAXSPEED/7)*4) {
+        teta = 0.003;
+        return;
+    }
+    if (speed < (MAXSPEED/7)*5) {
+        teta = 0.003;
+        return;
+    }
+    if (speed < (MAXSPEED/7)*6) {
+        teta = 0.003;
+        return;
+    }
+    if (speed < MAXSPEED) {
+        teta = 0.003;
+        return;
+    }
 }
 
 void init() {
@@ -294,25 +327,64 @@ void init() {
     gluPerspective(80, 1,	1, 30000.0);
 }
 
-void acceleration (double &speed_x) {
-    if (speed_x == MAXSPEED)
+void acceleration(double &speed_x) {
+    if (speed_x == MAXSPEED) {
+        std::cout << 1 << std::endl;
         return;
-    if (speed_x < MAXSPEED/(MAXSPEED/7.4)) {
-        speed_x += 0.05 * COEFF;
     }
-    if (speed_x < MAXSPEED/(MAXSPEED/6.6666)) {
-        speed_x += 0.5*COEFF;
-    } else if (speed_x < (MAXSPEED/3.3333)) {
-        speed_x += 0.3*COEFF;
-    } else if (speed_x < (MAXSPEED/1.428)) {
-        speed_x += 0.2*COEFF;
-    } else if (speed_x < (MAXSPEED/1.2)) {
-        speed_x += 0.1*COEFF;
-    } else {
-        speed_x + 0.07*COEFF;
-        if (speed_x > MAXSPEED)
-            speed_x = MAXSPEED;
+    if (speed_x < MAXSPEED/28) {
+        if (speed < 1) {
+            speed_x = 1;
+        }
+        speed_x += (speed_x * 0.5) * COEFF;
+        return;
     }
+    if (speed_x < (MAXSPEED/14)*2) {
+        speed_x += (speed_x * 1.8) * COEFF;
+        return;
+    }
+    if (speed_x < (MAXSPEED/14)*3) {
+        std::cout << 3 << std::endl;
+        speed_x += (speed_x * 1.9) * COEFF;
+        return;
+    }
+    if (speed_x < (MAXSPEED/14)*4) {
+        std::cout << 3 << std::endl;
+        speed_x += (speed_x * 2.3) * COEFF;
+        return;
+    }
+    if (speed_x < (MAXSPEED/14)*5) {
+        std::cout << 3 << std::endl;
+        speed_x += (speed_x * 2) * COEFF;
+        return;
+    }
+    if (speed_x < (MAXSPEED/7)*3) {
+        std::cout << 4 << std::endl;
+        speed_x += (speed_x * 1.3) * COEFF;
+        return;
+    }
+    if (speed_x < (MAXSPEED/7)*4) {
+        std::cout << 5 << std::endl;
+        speed_x += (speed_x * 0.7) * COEFF;
+        return;
+    }
+    if (speed_x < (MAXSPEED/7)*5) {
+        std::cout << 6 << std::endl;
+        speed_x += (speed_x * 0.5) * COEFF;
+        return;
+    }
+    if (speed_x < (MAXSPEED/7)*6) {
+        std::cout << 7 << std::endl;
+        speed_x += (speed_x * 0.25) * COEFF;
+        return;
+    }
+    if (speed_x < MAXSPEED) {
+        std::cout << 8 << std::endl;
+        speed_x += (speed_x * 0.19) * COEFF;
+        return;
+    }
+    std::cout << 9 << std::endl;
+    speed_x = MAXSPEED;
 }
 
 double deceleration(double speed_x) {

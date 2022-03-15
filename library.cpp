@@ -1,8 +1,3 @@
-#include <GL/glew.h>
-#include <GL/freeglut.h>
-#include <string>
-#include <cstring>
-
 #include "library.h"
 #define PRECISION 0.05
 
@@ -80,7 +75,7 @@ void renderTrackSelection() {
     glLineWidth(1.0);
     printText(100,1800,"* 1 - 0 shaped circuit");
     printText(100,1400,"* 2 - Run circuit");
-    printText(100,1000,"* 3 - Shaped circuit");
+    printText(100,1000,"* 3 - T shaped circuit");
 
     glutSwapBuffers();
 }
@@ -136,8 +131,8 @@ void renderGuide() {
     glLineWidth(1.0);
     printText(100,1800,"- Up arrow : to advance and accelerate");
     printText(100,1600,"- Down arrow : to slow down and back up");
-    printText(100,1400,"- Left arrow : to turn left");
-    printText(100,1200,"- Right arrow : to turn right");
+    printText(100,1400,"- Left arrow : to teta left");
+    printText(100,1200,"- Right arrow : to teta right");
 
     printText(300,300,"[ Press Enter to go back to the Menu ]");
 
@@ -195,93 +190,6 @@ float binomial_coff(float n,float k) {
 
 ///**********       Draw       **********///
 
-void drawSquare(double a) {
-    glColor3f(1.0,0.0,0.0);
-    glBegin(GL_QUADS);{
-        glVertex3f( a, a,0);
-        glVertex3f( a,-a,0);
-        glVertex3f(-a,-a,0);
-        glVertex3f(-a, a,0);
-    }glEnd();
-}
-
-void drawCircle(double radius, int segments) {
-    int i;
-    struct point points[100];
-
-    glColor3f(1.0,0.0,1.0);
-
-    //generates points
-    for(i = 0; i <= segments; i++) {
-        points[i].x = radius * cos(((double)i/(double)segments)*2*pi);
-        points[i].y = radius * sin(((double)i/(double)segments)*2*pi);
-    }
-
-    //draw segments using generated points
-    for(i = 0; i < segments; i++) {
-        glBegin(GL_LINES);{
-            glVertex3f(points[i].x,points[i].y,0);
-            glVertex3f(points[i+1].x,points[i+1].y,0);
-        }glEnd();
-    }
-}
-
-//not used for the moment
-void drawBarrier() {
-    glPushMatrix();
-    glColor3f(0.184, 0.109, 0.13);
-
-    glTranslatef(0,0,3);
-
-    //Left one
-    glBegin(GL_POLYGON);{
-        glVertex3f(70,0,-30);
-        glVertex3f(70,0,-20);
-
-        glVertex3f(70,-2500,-20);
-        glVertex3f(70,-2500,-30);
-    }glEnd();
-
-    //Right one
-    glBegin(GL_POLYGON);{
-        glVertex3f(-90,0,-30);
-        glVertex3f(-90,0,-20);
-
-        glVertex3f(-90,-2500,-20);
-        glVertex3f(-90,-2500,-30);
-    }glEnd();
-
-    glPopMatrix();
-}
-
-//not used for the moment
-void drawObstacle() {
-    glPushMatrix();
-    glColor3f(0.184, 0.109, 0.13);
-
-    glTranslatef(0,0,3);
-
-    int nb = -400;
-
-    //Front side
-    glBegin(GL_QUADS);{
-        glVertex3f( 3, -100+nb,-30);
-        glVertex3f( 3,-100+nb,-10);
-        glVertex3f(-3,-100+nb,-10);
-        glVertex3f(-3, -100+nb,-30);
-    }glEnd();
-
-    //Top side
-    glBegin(GL_QUADS);{
-        glVertex3f( 3, -100+nb,-10);
-        glVertex3f( 3,-105+nb,-10);
-        glVertex3f(-3,-105+nb,-10);
-        glVertex3f(-3, -100+nb,-10);
-    }glEnd();
-
-    glPopMatrix();
-}
-
 void drawMainCar(double leftRightMove, double car) {
     glPushMatrix();
 
@@ -336,39 +244,6 @@ void drawMainCar(double leftRightMove, double car) {
     }glPopMatrix();
 
     glPopMatrix();
-}
-
-void drawBackground(double sky) {
-    glPushMatrix();{
-        glTranslatef(0,sky,500);
-        glRotatef(90,0,0,1);
-        glColor3f(.3,0.9,.9);
-        glScalef(.003,2,1);
-        glutSolidCube(1000);
-    }glPopMatrix();
-}
-
-void drawHill(double sky) {
-    glPushMatrix();{
-        glTranslatef(500,sky+30,0);
-        glRotatef(90,0,0,1);
-        glColor3f(0,0.9,0);
-        glutSolidCone(200,400,20,20);
-    }glPopMatrix();
-
-    glPushMatrix();{
-        glTranslatef(-500,sky+30,0);
-        glRotatef(90,0,0,1);
-        glColor3f(0,0.9,0.5);
-        glutSolidCone(200,400,20,20);
-    }glPopMatrix();
-
-    glPushMatrix();{
-        glTranslatef(-700,sky+30,0);
-        glRotatef(90,0,0,1);
-        glColor3f(0,0.9,0.5);
-        glutSolidCone(200,400,20,20);
-    }glPopMatrix();
 }
 
 void drawLine(std::pair<double,double> p1, std::pair<double, double> p2, std::pair<double, double> p3, double z) {
@@ -481,17 +356,13 @@ void drawPolygonsFromVectors(std::vector<std::pair<double,double>> v, double z, 
             }
         }
         i++;
-        /*std::cout << " p1 = " << p1.first << ", " << p1.second << "\n";
-        std::cout << " p2 = " << p2.first << ", " << p2.second << "\n";
-        std::cout << " p3 = " << p3.first << ", " << p3.second << "\n";
-        std::cout << " p4 = " << p4.first << ", " << p4.second << "\n";*/
     }
     drawLine(p1, p2, p3, z);
     drawLine(p2, p3, p4, z);
     glColor3f(r,g,b);
 }
 
-void HUD(double speed, int laps, int num_total_laps, Timer pInt[3]) {
+void HUD(double speed, int laps, int num_total_laps, Timer pInt[3], const int penalities[4], bool outOfTheRoad) {
     glTranslatef(-450, -450, 0);
 
     glColor3f(0.663, 0.663, 0.663); 
@@ -537,14 +408,26 @@ void HUD(double speed, int laps, int num_total_laps, Timer pInt[3]) {
         glVertex3f(80*cos(nt*3.14/180),80*sin(nt*3.14/180),0.5);
     }glEnd();
 
+    //print the sped
     char speed_value[32];
-    sprintf(speed_value, "%.0f", speed*22);
+    sprintf(speed_value, "%.0f", speed*7);
     glColor3f(0, 0, 0);
     glRasterPos3f(-20, 20 ,0);
     for(int i = 0; speed_value[i] != '\0'; i++) {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, speed_value[i]);
     }
+    if (outOfTheRoad){
+        //print the sped
+        char OOTR[45];
+        sprintf(OOTR, "OUT OF THE ROAD ! \n 10s penality for the lap");
+        glColor3f(0, 0, 0);
+        glRasterPos3f(300, 500 ,0);
+        for(int i = 0; OOTR[i] != '\0'; i++) {
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, OOTR[i]);
+        }
+    }
 
+    //print the number of laps
     char number_laps[32];
     if (laps != 4) {
         sprintf(number_laps, "laps : %d / %d", laps, num_total_laps);
@@ -563,7 +446,7 @@ void HUD(double speed, int laps, int num_total_laps, Timer pInt[3]) {
             char lapTime[32];
             if (i == 4) {
                 if (pInt[2].elapsedSeconds() >= 10) {
-                    auto total_time = pInt[0].elapsedSeconds() + pInt[1].elapsedSeconds() + pInt[2].elapsedSeconds();
+                    auto total_time = pInt[0].elapsedSeconds() + pInt[1].elapsedSeconds() + pInt[2].elapsedSeconds() + penalities[1] + penalities[2] + penalities[3] ;
                     sprintf(lapTime, "total lap time : %.2f seconds", total_time);
                     glColor3f(0, 0, 0);
                     glRasterPos3f(600, 900 - (30 * i), 0);
@@ -572,7 +455,7 @@ void HUD(double speed, int laps, int num_total_laps, Timer pInt[3]) {
                     }
                 }
             } else {
-                sprintf(lapTime, "lap %d : %f seconds", i, pInt[i - 1].elapsedSeconds());
+                sprintf(lapTime, "lap %d : %f seconds", i, pInt[i - 1].elapsedSeconds() + penalities[i]);
                 glColor3f(0, 0, 0);
                 glRasterPos3f(600, 900 - (30 * i), 0);
                 for (int j = 0; lapTime[j] != '\0'; j++) {
@@ -584,7 +467,7 @@ void HUD(double speed, int laps, int num_total_laps, Timer pInt[3]) {
     }
 }
 
-void drawHUD(double speed, int i, int i1, Timer pInt[3]) {
+void drawHUD(double speed, int i, int i1, Timer pInt[3], int penalities[4], bool outOfTheRoad) {
     // setup viewing projection
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -596,7 +479,7 @@ void drawHUD(double speed, int i, int i1, Timer pInt[3]) {
     glPushMatrix();
     glLoadIdentity();
 
-    HUD(speed, i, i1, pInt);
+    HUD(speed, i, i1, pInt, penalities, outOfTheRoad);
 
     //set 3D matrix mode back
     glMatrixMode(GL_PROJECTION);

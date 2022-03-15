@@ -22,4 +22,4 @@ public:
     bool                                               m_bRunning = false;
 };
 
-#endif //DRIVING_SIMULATOR_TIMER_H
+#endif //TIMER_H
