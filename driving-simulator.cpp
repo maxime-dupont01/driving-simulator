@@ -25,10 +25,12 @@ float teta = .01;
 bool enoughTime = true;
 int numberOfLaps = 0;
 int maxLaps = 3;
+
 bool outOfTheRoad = false;
 bool turn_left = false;
 bool turn_right = false;
-
+bool finished = false;
+bool first_display = true;
 Circuit circuit;
 
 // The different windows
@@ -113,10 +115,9 @@ int main(int argc, char **argv){
 
     return 0;
 }
-bool first_display = true;
 
 void turn();
-bool finished = false;
+
 void display() {
 //    std::cout << speed << std::endl;
     if (!finished){
