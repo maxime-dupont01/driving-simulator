@@ -29,8 +29,9 @@ extern int winMenu, winGuide, winRun, winTrackSelection;
 
 extern int trackSelected;
 
+extern bool first_display;
+
 extern ISoundEngine* soundEngine; //for sound
-extern ISoundEngine* soundEngine_effets; //for sound for effets
 
 struct point {
     double x, y, z;
@@ -57,6 +58,7 @@ void mouseMenu(int button, int state, int x, int y);
 /*Track */
 void renderTrackSelection();
 void mouseTrackSelection(int button, int state, int x, int y);
+void keyboardTrackSelection(unsigned char Key, int x, int y);
 
 /* Guide */
 void renderGuide();

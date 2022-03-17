@@ -6,10 +6,9 @@
 #define COEFF 0.03
 #define COEFF_TURN 1
 #define PI (2*acos(0.0))
-
+#define LAPS 3
 
 float lx=0.0f,lz=-1.0f; // actual vector representing the camera's direction
-double leftRightMove = 0;
 double speed = 0.0;
 time_t oldTime_fps;
 Timer starting_timer;
@@ -19,7 +18,6 @@ int penalities[4];
 Timer reduceNoiseCollision;
 unsigned long time_recorded = 0;
 int fps = 0;
-unsigned int state = 0; // different than 0 for shake camera
 
 float teta = .01;
 bool enoughTime = true;
@@ -30,19 +28,18 @@ bool outOfTheRoad = false;
 bool turn_left = false;
 bool turn_right = false;
 bool finished = false;
-bool first_display = true;
+int vue_level = 0; //point of vue,  0 : default,    1 : first,    2 : far away
+int vue_count = 3;
 Circuit circuit;
 
 // The different windows
 int winMenu, winGuide, winRun, winTrackSelection;
 
+bool first_display;
+
 int trackSelected;
 
-//point l, u, r;
-car_coord coord_car;
-
-ISoundEngine* soundEngine; //for sound
-ISoundEngine* soundEngine_effets; //for sound for effets
+ISoundEngine* soundEngine; //for main sound
 
 keys_use keys;
 
@@ -72,6 +69,7 @@ int main(int argc, char **argv){
     glutDisplayFunc(renderTrackSelection);
     glutReshapeFunc(stopReshape);
     glutMouseFunc(mouseTrackSelection);
+    glutKeyboardFunc(keyboardTrackSelection);
     glutHideWindow();
 
     // Main application
@@ -92,10 +90,6 @@ int main(int argc, char **argv){
     if (!soundEngine){
         printf("Could not startup soundEngine\n");
     }
-    soundEngine_effets = createIrrKlangDevice();
-    if (!soundEngine_effets){
-        printf("Could not startup soundEngine for effects\n");
-    }
 
     glEnable(GL_DEPTH_TEST);
     /*glEnable(GL_CULL_FACE);
@@ -108,9 +102,6 @@ int main(int argc, char **argv){
     if(soundEngine) {
         soundEngine->drop(); // delete soundEngine
     }
-    if(soundEngine_effets) {
-        soundEngine_effets->drop(); // delete soundEngine effects
-    }
     //glutSetKeyRepeat(GLUT_KEY_REPEAT_ON);
 
     return 0;
@@ -119,17 +110,24 @@ int main(int argc, char **argv){
 void turn();
 
 void display() {
-//    std::cout << speed << std::endl;
     if (!finished){
         if (first_display) {
             circuit.generate_circuit(trackSelected); //with track selected
-            circuit.print();
+            //circuit.print();
             first_display = false;
             starting_timer.start();
         }
 
-        if (numberOfLaps > maxLaps) { // 3 tour de circuit
+        if (numberOfLaps > LAPS) { // 3 tour de circuit
             finished = true;
+
+            // play final sound
+            soundEngine->stopAllSounds();
+            soundEngine->play2D("./irrKlang/media/final.ogg", true, false, true);
+            if(soundEngine) {
+                soundEngine->setSoundVolume(0.5f);
+            }
+
             return;
         }
 
@@ -186,7 +184,26 @@ void display() {
     //initialize the matrix
     glLoadIdentity();
 
-    gluLookAt(0,50, 10,	0+lx,-990, 0+lz,	0,0,1);
+    if(finished){
+        gluLookAt(0,100, 50,	0+lx,-990, 0+lz,	0,0,1);
+        //gluLookAt(0,-100, 30,	0+lx,+990, 0+lz,	0,0,1);
+        //gluLookAt(-100,-100, 20,	+990,+990, 0+lz,	0,0,1);
+    } else {
+        switch (vue_level) {
+            case 0: // default vue
+                gluLookAt(0,50, 10,	0+lx,-990, 0+lz,	0,0,1);
+                break;
+            case 1: // first
+                gluLookAt(0,0, 10,	0+lx,-990, 0+lz,	0,0,1);
+                break;
+            case 2: // far
+                gluLookAt(0,100, 30,	0+lx,-990, 0+lz,	0,0,1);
+                break;
+            default:
+                std::cout << "Problem with vue" << std::endl;
+        }
+    }
+
 
     glMatrixMode(GL_MODELVIEW);
     teta *= 0.8;
@@ -219,11 +236,7 @@ void display() {
     drawPolygonsFromVectors(circuit.roads, -30.0, 0.245, 0.245, 0.245);
     drawPolygonsFromVectors(circuit.middle_roads, -29.80, 1, 1, 1);
 
-    drawMainCar(leftRightMove, 0);
-    /*
-    drawBackground(sky);
-    drawHill(sky);
-    */
+    drawMainCar(0, 0);
     drawHUD(speed, numberOfLaps, maxLaps, lapTimes, penalities, outOfTheRoad);
     glutSwapBuffers();
 
@@ -310,6 +323,10 @@ void turn() {
 }
 
 void init() {
+    first_display = true;
+
+    circuit.generate_circuit(trackSelected); //with track selected
+    circuit.print();
 
     //clear the screen
     glClearColor(0, 0, 0, 0);
@@ -330,7 +347,7 @@ void init() {
 
 void acceleration(double &speed_x) {
     if (speed_x == MAXSPEED) {
-        std::cout << 1 << std::endl;
+        //std::cout << 1 << std::endl;
         return;
     }
     if (speed_x < MAXSPEED/28) {
@@ -345,46 +362,46 @@ void acceleration(double &speed_x) {
         return;
     }
     if (speed_x < (MAXSPEED/14)*3) {
-        std::cout << 3 << std::endl;
+        //std::cout << 3 << std::endl;
         speed_x += (speed_x * 1.9) * COEFF;
         return;
     }
     if (speed_x < (MAXSPEED/14)*4) {
-        std::cout << 3 << std::endl;
+        //std::cout << 3 << std::endl;
         speed_x += (speed_x * 2.3) * COEFF;
         return;
     }
     if (speed_x < (MAXSPEED/14)*5) {
-        std::cout << 3 << std::endl;
+        //std::cout << 3 << std::endl;
         speed_x += (speed_x * 2) * COEFF;
         return;
     }
     if (speed_x < (MAXSPEED/7)*3) {
-        std::cout << 4 << std::endl;
+        //std::cout << 4 << std::endl;
         speed_x += (speed_x * 1.3) * COEFF;
         return;
     }
     if (speed_x < (MAXSPEED/7)*4) {
-        std::cout << 5 << std::endl;
+        //std::cout << 5 << std::endl;
         speed_x += (speed_x * 0.7) * COEFF;
         return;
     }
     if (speed_x < (MAXSPEED/7)*5) {
-        std::cout << 6 << std::endl;
+        //std::cout << 6 << std::endl;
         speed_x += (speed_x * 0.5) * COEFF;
         return;
     }
     if (speed_x < (MAXSPEED/7)*6) {
-        std::cout << 7 << std::endl;
+        //std::cout << 7 << std::endl;
         speed_x += (speed_x * 0.25) * COEFF;
         return;
     }
     if (speed_x < MAXSPEED) {
-        std::cout << 8 << std::endl;
+        //std::cout << 8 << std::endl;
         speed_x += (speed_x * 0.19) * COEFF;
         return;
     }
-    std::cout << 9 << std::endl;
+    //std::cout << 9 << std::endl;
     speed_x = MAXSPEED;
 }
 
@@ -444,12 +461,15 @@ void specialUpListener(int key, int x, int y){
 }
 
 void keyboardListener(unsigned char Key, int x, int y){
-    switch(Key){
-        case 27: // Escape key
+     switch(Key){
+        case 27: // Escape key -> go back to the menu
             glutHideWindow();
             glutSetWindow(winMenu);
             glutShowWindow();
-            soundEngine->stopAllSounds();
+            soundEngine->setAllSoundsPaused();
+            break;
+        case 9: // Tabulation key -> change view
+            vue_level = (vue_level + 1) % vue_count;
             break;
     }
 }

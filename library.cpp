@@ -26,23 +26,24 @@ void renderMenu() {
 void mouseMenu(int button, int state, int x, int y) {
     if ((state == GLUT_DOWN) && (button == GLUT_LEFT_BUTTON)){
         if( (x > 110) && (x < 200) && (y > 305) && (y < 345) ) {
-            //Track Selection
-            glutHideWindow();
-            glutSetWindow(winTrackSelection);
-            glutShowWindow();
 
-            /*
-            //Play
-            glutHideWindow();
-            glutSetWindow(winRun);
-            glutShowWindow();
+            if(first_display){
+                //Track Selection
+                glutHideWindow();
+                glutSetWindow(winTrackSelection);
+                glutShowWindow();
+            } else {
+                //Play
+                glutHideWindow();
+                glutSetWindow(winRun);
+                glutShowWindow();
 
-            // play main sound
-            soundEngine->play2D("./irrKlang/media/getout.ogg", true, false, true);
-            if(soundEngine) {
-                soundEngine->setSoundVolume(0.5f);
+                // play main sound
+                soundEngine->play2D("./irrKlang/media/getout.ogg", true, false, true);
+                if(soundEngine) {
+                    soundEngine->setSoundVolume(0.5f);
+                }
             }
-             */
 
         } else if( (x > 110) && (x < 240) && (y > 368) && (y < 403) ) {
             //Guide
@@ -78,6 +79,16 @@ void renderTrackSelection() {
     printText(100,1000,"* 3 - T shaped circuit");
 
     glutSwapBuffers();
+}
+void keyboardTrackSelection(unsigned char Key, int x, int y){
+    switch(Key){
+        case 27: // Escape key -> go back to the menu
+            glutHideWindow();
+            glutSetWindow(winMenu);
+            glutShowWindow();
+            soundEngine->stopAllSounds();
+            break;
+    }
 }
 void mouseTrackSelection(int button, int state, int x, int y) {
     if ((state == GLUT_DOWN) && (button == GLUT_LEFT_BUTTON)) {

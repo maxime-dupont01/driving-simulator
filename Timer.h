@@ -1,7 +1,3 @@
-//
-// Created by rmarques on 14/03/2022.
-//
-
 #ifndef TIMER_H
 #define TIMER_H
 #include <iostream>
