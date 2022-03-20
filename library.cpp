@@ -142,8 +142,9 @@ void renderGuide() {
     glLineWidth(1.0);
     printText(100,1800,"- Up arrow : to advance and accelerate");
     printText(100,1600,"- Down arrow : to slow down and back up");
-    printText(100,1400,"- Left arrow : to teta left");
-    printText(100,1200,"- Right arrow : to teta right");
+    printText(100,1400,"- Left arrow : to turn left");
+    printText(100,1200,"- Right arrow : to turn right");
+    printText(100,1000,"- Tab : to change view");
 
     printText(300,300,"[ Press Enter to go back to the Menu ]");
 
