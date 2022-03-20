@@ -65,6 +65,7 @@ void renderGuide();
 void keyboardGuide(unsigned char Key, int x, int y);
 
 void stopReshape(int w,int h);
+void stopReshapeMain(int w, int h);
 
 void printText(GLfloat x, GLfloat y, std::string text);
 void output(double x, double y, char *string);

@@ -163,6 +163,9 @@ void keyboardGuide(unsigned char Key, int x, int y){
 void stopReshape(int w, int h) {
     glutReshapeWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
+void stopReshapeMain(int w, int h) {
+    glutReshapeWindow(WINDOW_W_H_RUN, WINDOW_W_H_RUN);
+}
 
 void printText(GLfloat x, GLfloat y, std::string text) {
     glPushMatrix();

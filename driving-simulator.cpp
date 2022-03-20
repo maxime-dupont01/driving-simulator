@@ -76,6 +76,7 @@ int main(int argc, char **argv){
     glutInitWindowSize(WINDOW_W_H_RUN, WINDOW_W_H_RUN);
     winRun = glutCreateWindow("car driving test");
     glutDisplayFunc(display);
+    glutReshapeFunc(stopReshapeMain);
     glutIdleFunc(animate);
     glutKeyboardFunc(keyboardListener);
     glutSpecialFunc(specialKeyListener);
